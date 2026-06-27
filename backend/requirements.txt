@@ -1,28 +1,17 @@
-# Core
 fastapi==0.110.0
 uvicorn[standard]==0.29.0
 pydantic-settings==2.2.1
-python-dotenv
+python-dotenv==1.0.0
 PyJWT==2.8.0
 passlib[bcrypt]==1.7.4
-
-# Database - Using built-in sqlite3
-
-# AI & Agents
-crewai
-google-generativeai
-langchain
-langchain-google-genai
-
-# Grok Fallback Provider (Groq inference API — used by LiteLLM via crewai)
-# LiteLLM supports groq/ prefix natively; no extra library needed beyond crewai.
-# Optional: install groq SDK for direct SDK calls (not required for crewai route)
-groq
-
-# Financial Data
-yfinance>=0.2.40
+crewai==0.22.5
+google-generativeai==0.4.1
+langchain==0.1.20
+langchain-core==0.1.53
+langchain-google-genai==1.0.1
+langchain-openai==0.0.5
+groq==1.2.0
+yfinance==1.4.0
 pandas==2.2.1
-
-# Utilities
 pytest==8.1.1
 httpx==0.27.0
