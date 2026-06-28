@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Clock, Search, Filter, TrendingUp, TrendingDown,
   Minus, ChevronRight, Calendar, Bot, BarChart2,
-  Download, RefreshCw, Eye
+  Download, RefreshCw, Eye, X
 } from 'lucide-react';
 import Markdown from '../components/Markdown';
 
@@ -178,14 +178,33 @@ export default function History() {
           })}
         </div>
 
+        {/* Mobile Backdrop Overlay for Detail Drawer */}
+        {selected && (
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden"
+            onClick={() => setSelected(null)}
+          />
+        )}
+
         {/* Detail Panel */}
-        <div className="xl:col-span-1">
-          <div className="glass rounded-2xl overflow-hidden sticky top-4">
-            <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className={`
+          fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#090d1f] shadow-2xl p-0 
+          transform transition-transform duration-300 ease-in-out flex flex-col h-screen
+          xl:relative xl:transform-none xl:transition-none xl:z-0 xl:w-auto xl:max-w-none xl:bg-transparent xl:shadow-none xl:h-auto xl:col-span-1
+          ${selected ? 'translate-x-0' : 'translate-x-full xl:translate-x-0'}
+        `}>
+          <div className="glass rounded-none xl:rounded-2xl overflow-hidden flex flex-col h-full xl:h-auto xl:sticky xl:top-4">
+            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <h3 className="text-sm font-bold text-white">Session Detail</h3>
+              <button 
+                onClick={() => setSelected(null)}
+                className="xl:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
             {selected ? (
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-4 overflow-y-auto flex-1 xl:overflow-visible">
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Ticker</p>
                   <p className="text-lg font-black text-white">{selected.ticker}
