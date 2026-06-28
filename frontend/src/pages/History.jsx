@@ -6,6 +6,7 @@ import {
   Minus, ChevronRight, Calendar, Bot, BarChart2,
   Download, RefreshCw, Eye
 } from 'lucide-react';
+import Markdown from '../components/Markdown';
 
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -207,7 +208,9 @@ export default function History() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 mb-2">Summary</p>
-                  <p className="text-xs text-slate-300 leading-relaxed">{selected.summary}</p>
+                  <div className="text-slate-300">
+                    <Markdown content={selected.summary} />
+                  </div>
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 mb-2">Agents Involved</p>

@@ -5,6 +5,7 @@ import {
   Users, Zap, AlertTriangle, CheckCircle2, Clock,
   BarChart3, Activity, ChevronDown, ChevronUp, BookOpen
 } from 'lucide-react';
+import Markdown from '../components/Markdown';
 
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -131,12 +132,12 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
           )}
           {result && (
             <>
-              <div className={`text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-mono ${!expanded ? 'max-h-36 overflow-hidden' : ''}`}
+              <div className={`text-slate-300 ${!expanded ? 'max-h-36 overflow-hidden' : ''}`}
                 style={{ maskImage: !expanded ? 'linear-gradient(to bottom, black 60%, transparent 100%)' : 'none' }}>
-                {result}
+                <Markdown content={result} />
               </div>
               <button onClick={() => setExpanded(e => !e)}
-                className="mt-2 flex items-center space-x-1 text-xs font-semibold transition-colors"
+                className="mt-2.5 flex items-center space-x-1 text-xs font-semibold transition-colors"
                 style={{ color }}>
                 {expanded ? <><ChevronUp className="w-3.5 h-3.5" /><span>Show less</span></>
                            : <><ChevronDown className="w-3.5 h-3.5" /><span>Show full output</span></>}
@@ -261,9 +262,9 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
         )}
         {result && (
           <>
-            <div className={`text-sm text-slate-200 leading-relaxed whitespace-pre-wrap ${!expanded ? 'max-h-48 overflow-hidden' : ''}`}
+            <div className={`text-slate-200 ${!expanded ? 'max-h-60 overflow-hidden' : ''}`}
               style={{ maskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none' }}>
-              {result}
+              <Markdown content={result} />
             </div>
             <button onClick={() => setExpanded(e => !e)}
               className="mt-3 flex items-center space-x-1.5 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">
