@@ -7,6 +7,7 @@ import {
   Download, RefreshCw, Eye, X
 } from 'lucide-react';
 import Markdown from '../components/Markdown';
+import { useTheme } from '../context/ThemeContext';
 
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -16,7 +17,15 @@ const REC_CONFIG = {
   SELL: { badge: 'badge-red',    icon: TrendingDown, label: 'SELL' },
 };
 
+const FILTER_COLORS = {
+  ALL:  { bg: 'rgba(79, 139, 255, 0.12)', border: 'rgba(79, 139, 255, 0.35)', text: 'var(--accent-blue)' },
+  BUY:  { bg: 'rgba(52, 211, 153, 0.12)', border: 'rgba(52, 211, 153, 0.35)', text: 'var(--accent-emerald)' },
+  HOLD: { bg: 'rgba(251, 191, 36, 0.12)', border: 'rgba(251, 191, 36, 0.35)', text: 'var(--accent-amber)' },
+  SELL: { bg: 'rgba(251, 113, 133, 0.12)', border: 'rgba(251, 113, 133, 0.35)', text: 'var(--accent-rose)' },
+};
+
 export default function History() {
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('ALL');
@@ -42,133 +51,212 @@ export default function History() {
      s.company.toLowerCase().includes(search.toLowerCase()))
   );
 
+  const statCards = [
+    { label: 'Total Sessions', value: sessions.length, accent: 'var(--accent-blue)', bg: 'rgba(79, 139, 255, 0.08)' },
+    { label: 'BUY Signals',   value: sessions.filter(s => s.rec === 'BUY').length,  accent: 'var(--accent-emerald)', bg: 'rgba(52, 211, 153, 0.08)' },
+    { label: 'HOLD Signals',  value: sessions.filter(s => s.rec === 'HOLD').length, accent: 'var(--accent-amber)', bg: 'rgba(251, 191, 36, 0.08)' },
+    { label: 'SELL Signals',  value: sessions.filter(s => s.rec === 'SELL').length, accent: 'var(--accent-rose)', bg: 'rgba(251, 113, 133, 0.08)' },
+  ];
+
   return (
     <div className="p-4 sm:p-6 md:p-8 space-y-6 animate-fade-up">
 
-      {/* Header Controls */}
+      {/* ── Filter Bar ── */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center space-x-3 flex-1 min-w-[280px] max-w-sm">
+        <div className="flex items-center flex-1 min-w-[260px] max-w-sm">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+              style={{ color: 'var(--text-muted)' }}
+            />
             <input
-              className="fincon-input pl-10"
+              className="input-field w-full pl-10"
               placeholder="Search ticker or company…"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
           </div>
         </div>
+
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 max-w-full">
-          {['ALL', 'BUY', 'HOLD', 'SELL'].map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                filter === f
-                  ? 'text-white'
-                  : 'text-slate-500 hover:text-slate-300'
-              }`}
-              style={filter === f ? {
-                background: f === 'BUY' ? 'rgba(16,185,129,0.2)' : f === 'SELL' ? 'rgba(239,68,68,0.2)' : f === 'HOLD' ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.2)',
-                border: `1px solid ${f === 'BUY' ? 'rgba(16,185,129,0.4)' : f === 'SELL' ? 'rgba(239,68,68,0.4)' : f === 'HOLD' ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.4)'}`,
-                color: f === 'BUY' ? '#34d399' : f === 'SELL' ? '#f87171' : f === 'HOLD' ? '#fbbf24' : '#60a5fa',
-              } : { background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.06)' }}
-            >{f}</button>
-          ))}
+          {['ALL', 'BUY', 'HOLD', 'SELL'].map(f => {
+            const active = filter === f;
+            const colors = FILTER_COLORS[f];
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className="btn-ghost px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
+                style={active
+                  ? { background: colors.bg, border: `1px solid ${colors.border}`, color: colors.text }
+                  : { border: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }
+                }
+              >
+                {f}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Stats Row */}
+      {/* ── Stats Row ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Sessions', value: sessions.length, color: '#3b82f6' },
-          { label: 'BUY Signals',   value: sessions.filter(s => s.rec === 'BUY').length,  color: '#10b981' },
-          { label: 'HOLD Signals',  value: sessions.filter(s => s.rec === 'HOLD').length, color: '#f59e0b' },
-          { label: 'SELL Signals',  value: sessions.filter(s => s.rec === 'SELL').length, color: '#ef4444' },
-        ].map(s => (
-          <div key={s.label} className="glass rounded-2xl p-4 text-center">
-            <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
-            <p className="text-xs text-slate-500 mt-1">{s.label}</p>
+        {statCards.map(s => (
+          <div
+            key={s.label}
+            className="card rounded-2xl p-4 flex items-center space-x-3 transition-all duration-200"
+            style={{ borderLeft: `3px solid ${s.accent}` }}
+          >
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: s.bg }}
+            >
+              <BarChart2 className="w-4 h-4" style={{ color: s.accent }} />
+            </div>
+            <div>
+              <p className="text-2xl font-black" style={{ color: s.accent }}>{s.value}</p>
+              <p className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Main Layout */}
+      {/* ── Main Layout ── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         {/* Sessions List */}
         <div className="xl:col-span-2 space-y-3">
           {loading && (
-            <div className="glass rounded-2xl p-12 text-center">
-              <RefreshCw className="w-10 h-10 text-slate-700 mx-auto mb-3 animate-spin" />
-              <p className="text-slate-500 text-sm">Loading history...</p>
+            <div className="card rounded-2xl p-12 text-center">
+              <RefreshCw className="w-10 h-10 mx-auto mb-3 animate-spin" style={{ color: 'var(--text-muted)' }} />
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading history…</p>
             </div>
           )}
+
           {!loading && filtered.length === 0 && (
-            <div className="glass rounded-2xl p-12 text-center">
-              <Clock className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-              <p className="text-slate-500 text-sm">No sessions found</p>
+            <div className="card rounded-2xl p-12 text-center">
+              <Clock className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No sessions found</p>
             </div>
           )}
+
           {!loading && filtered.map(s => {
             const cfg = REC_CONFIG[s.rec];
             const RecIcon = cfg.icon;
             const isSelected = selected?.id === s.id;
             return (
-              <div key={s.id}
+              <div
+                key={s.id}
                 onClick={() => setSelected(isSelected ? null : s)}
-                className="glass rounded-2xl p-5 cursor-pointer transition-all duration-200"
+                className="card-interactive rounded-2xl p-5 cursor-pointer transition-all duration-200"
                 style={{
-                  border: `1px solid ${isSelected ? 'rgba(59,130,246,0.4)' : 'rgba(255,255,255,0.06)'}`,
-                  background: isSelected ? 'rgba(59,130,246,0.05)' : undefined,
-                }}>
+                  border: isSelected
+                    ? '1px solid var(--accent-blue)'
+                    : '1px solid var(--border-subtle)',
+                  background: isSelected ? 'rgba(79, 139, 255, 0.06)' : undefined,
+                  boxShadow: isSelected ? '0 0 20px rgba(79, 139, 255, 0.08)' : undefined,
+                }}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-xs text-white"
-                      style={{ background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {/* Ticker avatar */}
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-xs"
+                      style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
                       {s.ticker.slice(0, 2)}
                     </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-sm font-bold text-white">{s.ticker}</p>
-                        <p className="text-xs text-slate-500">{s.company}</p>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center space-x-2 flex-wrap">
+                        <span className="badge-blue text-xs font-bold">{s.ticker}</span>
+                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{s.company}</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1.5 leading-relaxed max-w-lg line-clamp-2">{s.summary}</p>
-                      <div className="flex items-center space-x-3 mt-2">
-                        <span className="flex items-center space-x-1 text-[10px] text-slate-600">
-                          <Calendar className="w-3 h-3" /><span>{s.date} · {s.time}</span>
+                      <p
+                        className="text-xs mt-1.5 leading-relaxed max-w-lg line-clamp-2"
+                        style={{ color: 'var(--text-tertiary)' }}
+                      >
+                        {s.summary}
+                      </p>
+                      <div className="flex items-center space-x-3 mt-2 flex-wrap">
+                        <span className="flex items-center space-x-1 text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                          <Calendar className="w-3 h-3" />
+                          <span>{s.date} · {s.time}</span>
                         </span>
-                        <span className="flex items-center space-x-1 text-[10px] text-slate-600">
-                          <Bot className="w-3 h-3" /><span>{s.agents.length} agents</span>
+                        <span className="flex items-center space-x-1 text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                          <Bot className="w-3 h-3" />
+                          <span>{s.agents.length} agents</span>
                         </span>
-                        <span className="flex items-center space-x-1 text-[10px] text-slate-600">
-                          <Clock className="w-3 h-3" /><span>{s.duration}</span>
+                        <span className="flex items-center space-x-1 text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                          <Clock className="w-3 h-3" />
+                          <span>{s.duration}</span>
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end space-y-2 flex-shrink-0">
+
+                  {/* Right side: badge + confidence + re-run */}
+                  <div className="flex flex-col items-end space-y-2 flex-shrink-0 ml-3">
                     <span className={cfg.badge + ' flex items-center space-x-1'}>
                       <RecIcon className="w-3 h-3" /><span>{cfg.label}</span>
                     </span>
+                    {/* Confidence bar */}
                     <div className="flex items-center space-x-1.5">
-                      <div className="w-16 h-1.5 rounded-full bg-slate-800">
-                        <div className="h-full rounded-full"
-                          style={{ width: `${s.score}%`, background: s.score > 80 ? '#10b981' : s.score > 60 ? '#f59e0b' : '#ef4444' }} />
+                      <div
+                        className="w-16 h-1.5 rounded-full overflow-hidden"
+                        style={{ background: 'var(--bg-elevated)' }}
+                      >
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${s.score}%`,
+                            background: s.score > 80
+                              ? 'var(--accent-emerald)'
+                              : s.score > 60
+                                ? 'var(--accent-amber)'
+                                : 'var(--accent-rose)',
+                          }}
+                        />
                       </div>
-                      <span className="text-[10px] text-slate-500">{s.score}%</span>
+                      <span className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>
+                        {s.score}%
+                      </span>
                     </div>
-                    <button onClick={e => { e.stopPropagation(); navigate('/analysis'); }}
-                      className="flex items-center space-x-1 text-[10px] text-blue-400 hover:text-blue-300 transition-colors">
+                    <button
+                      onClick={e => { e.stopPropagation(); navigate('/analysis'); }}
+                      className="flex items-center space-x-1 text-[10px] font-medium transition-colors"
+                      style={{ color: 'var(--accent-blue)' }}
+                    >
                       <RefreshCw className="w-3 h-3" /><span>Re-run</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Agents used */}
-                <div className="flex items-center space-x-2 mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                  <span className="text-[10px] text-slate-600 uppercase tracking-widest">Agents:</span>
+                {/* Agents row */}
+                <div
+                  className="flex items-center space-x-2 mt-3 pt-3 flex-wrap gap-y-1"
+                  style={{ borderTop: '1px solid var(--border-subtle)' }}
+                >
+                  <span
+                    className="text-[10px] uppercase tracking-widest font-semibold"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    Agents:
+                  </span>
                   {s.agents.map(a => (
-                    <span key={a} className="px-2 py-0.5 rounded-lg text-[10px] font-semibold text-slate-400"
-                      style={{ background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <span
+                      key={a}
+                      className="px-2 py-0.5 rounded-lg text-[10px] font-semibold"
+                      style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-tertiary)',
+                      }}
+                    >
                       {a}
                     </span>
                   ))}
@@ -178,75 +266,141 @@ export default function History() {
           })}
         </div>
 
-        {/* Mobile Backdrop Overlay for Detail Drawer */}
+        {/* ── Mobile Backdrop Overlay ── */}
         {selected && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden"
             onClick={() => setSelected(null)}
           />
         )}
 
-        {/* Detail Panel */}
+        {/* ── Detail Panel (Slide Drawer on mobile, Sticky on desktop) ── */}
         <div className={`
-          fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#090d1f] shadow-2xl p-0 
+          fixed inset-y-0 right-0 z-50 w-full max-w-lg shadow-2xl p-0
           transform transition-transform duration-300 ease-in-out flex flex-col h-screen
-          xl:relative xl:transform-none xl:transition-none xl:z-0 xl:w-auto xl:max-w-none xl:bg-transparent xl:shadow-none xl:h-auto xl:col-span-1
+          xl:relative xl:transform-none xl:transition-none xl:z-0 xl:w-auto xl:max-w-none xl:shadow-none xl:h-auto xl:col-span-1
           ${selected ? 'translate-x-0' : 'translate-x-full xl:translate-x-0'}
-        `}>
-          <div className="glass rounded-none xl:rounded-2xl overflow-hidden flex flex-col h-full xl:h-auto xl:sticky xl:top-4">
-            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <h3 className="text-sm font-bold text-white">Session Detail</h3>
-              <button 
+        `}
+          style={{ background: isDark ? '#090d1f' : 'var(--bg-card)' }}
+        >
+          <div
+            className="card rounded-none xl:rounded-2xl overflow-hidden flex flex-col h-full xl:h-auto xl:sticky xl:top-4"
+          >
+            {/* Panel header */}
+            <div
+              className="px-5 py-4 flex items-center justify-between"
+              style={{ borderBottom: '1px solid var(--border-subtle)' }}
+            >
+              <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                Session Detail
+              </h3>
+              <button
                 onClick={() => setSelected(null)}
-                className="xl:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                className="xl:hidden p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--text-muted)' }}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
+
             {selected ? (
-              <div className="p-5 space-y-4 overflow-y-auto flex-1 xl:overflow-visible">
+              <div className="p-5 space-y-5 overflow-y-auto flex-1 xl:overflow-visible">
+                {/* Ticker heading */}
                 <div>
-                  <p className="text-xs text-slate-500 mb-1">Ticker</p>
-                  <p className="text-lg font-black text-white">{selected.ticker}
-                    <span className="text-xs font-normal text-slate-500 ml-2">{selected.company}</span>
+                  <p className="label text-[10px] mb-1">Ticker</p>
+                  <p className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>
+                    {selected.ticker}
+                    <span className="text-xs font-normal ml-2" style={{ color: 'var(--text-muted)' }}>
+                      {selected.company}
+                    </span>
                   </p>
                 </div>
+
+                {/* Metric cards */}
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Recommendation', value: selected.rec, color: selected.rec === 'BUY' ? '#10b981' : selected.rec === 'SELL' ? '#ef4444' : '#f59e0b' },
-                    { label: 'Confidence', value: `${selected.score}%`, color: selected.score > 80 ? '#10b981' : '#f59e0b' },
-                    { label: 'Duration', value: selected.duration, color: '#3b82f6' },
-                    { label: 'Agents Used', value: selected.agents.length, color: '#8b5cf6' },
+                    {
+                      label: 'Recommendation',
+                      value: selected.rec,
+                      accent: selected.rec === 'BUY'
+                        ? 'var(--accent-emerald)'
+                        : selected.rec === 'SELL'
+                          ? 'var(--accent-rose)'
+                          : 'var(--accent-amber)',
+                    },
+                    {
+                      label: 'Confidence',
+                      value: `${selected.score}%`,
+                      accent: selected.score > 80 ? 'var(--accent-emerald)' : 'var(--accent-amber)',
+                    },
+                    {
+                      label: 'Duration',
+                      value: selected.duration,
+                      accent: 'var(--accent-blue)',
+                    },
+                    {
+                      label: 'Agents Used',
+                      value: selected.agents.length,
+                      accent: 'var(--accent-purple)',
+                    },
                   ].map(item => (
-                    <div key={item.label} className="rounded-xl p-3"
-                      style={{ background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <p className="text-[10px] text-slate-500 mb-1">{item.label}</p>
-                      <p className="text-base font-black" style={{ color: item.color }}>{item.value}</p>
+                    <div
+                      key={item.label}
+                      className="rounded-xl p-3 transition-all duration-200"
+                      style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-subtle)',
+                        borderLeft: `3px solid ${item.accent}`,
+                      }}
+                    >
+                      <p className="text-[10px] font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
+                        {item.label}
+                      </p>
+                      <p className="text-base font-black" style={{ color: item.accent }}>
+                        {item.value}
+                      </p>
                     </div>
                   ))}
                 </div>
+
+                {/* Summary */}
                 <div>
-                  <p className="text-xs text-slate-500 mb-2">Summary</p>
-                  <div className="text-slate-300">
+                  <p className="label text-[10px] mb-2">Summary</p>
+                  <div
+                    className="rounded-xl p-4"
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                  >
                     <Markdown content={selected.summary} />
                   </div>
                 </div>
+
+                {/* Agents involved */}
                 <div>
-                  <p className="text-xs text-slate-500 mb-2">Agents Involved</p>
+                  <p className="label text-[10px] mb-2">Agents Involved</p>
                   <div className="flex flex-wrap gap-1.5">
                     {selected.agents.map(a => (
                       <span key={a} className="badge-blue text-[10px]">{a}</span>
                     ))}
                   </div>
                 </div>
-                <button onClick={() => navigate('/analysis')} className="btn-primary w-full flex items-center justify-center space-x-2">
+
+                {/* Re-run button */}
+                <button
+                  onClick={() => navigate('/analysis')}
+                  className="btn-primary w-full flex items-center justify-center space-x-2"
+                >
                   <RefreshCw className="w-4 h-4" /><span>Re-run Analysis</span>
                 </button>
               </div>
             ) : (
               <div className="p-8 text-center">
-                <Eye className="w-8 h-8 text-slate-700 mx-auto mb-3" />
-                <p className="text-xs text-slate-600">Click a session to see details</p>
+                <Eye className="w-8 h-8 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  Click a session to see details
+                </p>
               </div>
             )}
           </div>

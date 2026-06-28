@@ -4,18 +4,26 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: "#0f172a", // slate-900 for dark mode
-        surface: "#1e293b", // slate-800
-        primary: "#3b82f6", // blue-500
-        secondary: "#10b981", // emerald-500
-        accent: "#8b5cf6", // violet-500
+        background: "var(--bg-base)",
+        surface: "var(--bg-surface)",
+        elevated: "var(--bg-elevated)",
+        primary: "var(--accent-blue)",
+        secondary: "var(--accent-emerald)",
+        accent: "var(--accent-purple)",
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      }
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      animation: {
+        'fade-up': 'fade-up 0.4s ease forwards',
+        'slide-in': 'slide-in-right 0.3s ease forwards',
+        'spin-slow': 'spin-slow 3s linear infinite',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

@@ -6,6 +6,7 @@ import {
   BarChart3, Activity, ChevronDown, ChevronUp, BookOpen
 } from 'lucide-react';
 import Markdown from '../components/Markdown';
+import { useTheme } from '../context/ThemeContext';
 
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -71,42 +72,51 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
   const statusIcon = loading
     ? <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: `${color}40`, borderTopColor: color }} />
     : result
-      ? <CheckCircle2 className="w-4 h-4" style={{ color: '#10b981' }} />
+      ? <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--accent-emerald)' }} />
       : error
-        ? <AlertTriangle className="w-4 h-4 text-red-400" />
-        : <Clock className="w-4 h-4 text-slate-600" />;
+        ? <AlertTriangle className="w-4 h-4" style={{ color: 'var(--accent-rose)' }} />
+        : <Clock className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />;
+
+  const statusLabel = loading ? 'Running' : result ? 'Complete' : error ? 'Error' : 'Idle';
 
   return (
-    <div className="rounded-2xl overflow-hidden transition-all duration-300"
+    <div
+      className="card card-hover rounded-2xl overflow-hidden transition-all duration-300"
       style={{
-        background: 'rgba(15,23,42,0.7)',
-        border: `1px solid ${result ? color + '40' : 'rgba(255,255,255,0.06)'}`,
-        backdropFilter: 'blur(16px)',
-        boxShadow: result ? `0 0 20px ${color}15` : 'none',
-      }}>
-
+        borderTop: `3px solid ${color}`,
+        boxShadow: result ? `var(--shadow-card), 0 0 20px ${color}12` : 'var(--shadow-card)',
+      }}
+    >
       {/* Card Header */}
-      <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: `${color}08` }}>
+      <div
+        className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        style={{ background: `${color}06` }}
+      >
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: `${color}12`, border: `1px solid ${color}25` }}
+          >
             <Icon className="w-5 h-5" style={{ color }} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white">{label}</p>
-            <p className="text-xs text-slate-500 mt-0.5 truncate sm:max-w-xs md:max-w-none">{description}</p>
+            <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{label}</p>
+            <p className="text-xs mt-0.5 truncate sm:max-w-xs md:max-w-none" style={{ color: 'var(--text-tertiary)' }}>
+              {description}
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-between sm:justify-end space-x-3 mt-2 sm:mt-0">
           <div className="flex items-center space-x-2">
             {statusIcon}
-            <span className="text-[10px] text-slate-500 sm:hidden">Status</span>
+            <span className="text-[10px] font-medium sm:hidden" style={{ color: 'var(--text-tertiary)' }}>
+              {statusLabel}
+            </span>
           </div>
           <button
             onClick={onRun}
             disabled={loading || (!ticker && agent.key !== 'portfolio')}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             style={{
               background: `linear-gradient(135deg, ${color}cc, ${color}88)`,
               boxShadow: `0 4px 12px ${color}30`,
@@ -120,27 +130,45 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
         </div>
       </div>
 
+      <hr className="divider" />
+
       {/* Result Area */}
       {(result || error) && (
         <div className="px-5 py-4">
           {error && (
-            <div className="flex items-start space-x-2 text-red-400 text-xs p-3 rounded-xl"
-              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <div
+              className="flex items-start space-x-2 text-xs p-3 rounded-xl"
+              style={{
+                background: 'rgba(251, 113, 133, 0.08)',
+                border: '1px solid rgba(251, 113, 133, 0.2)',
+                color: 'var(--accent-rose)',
+              }}
+            >
               <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
           {result && (
             <>
-              <div className={`text-slate-300 ${!expanded ? 'max-h-36 overflow-hidden' : ''}`}
-                style={{ maskImage: !expanded ? 'linear-gradient(to bottom, black 60%, transparent 100%)' : 'none' }}>
+              <div
+                className={`${!expanded ? 'max-h-36 overflow-hidden' : ''}`}
+                style={{
+                  color: 'var(--text-secondary)',
+                  maskImage: !expanded ? 'linear-gradient(to bottom, black 60%, transparent 100%)' : 'none',
+                  WebkitMaskImage: !expanded ? 'linear-gradient(to bottom, black 60%, transparent 100%)' : 'none',
+                }}
+              >
                 <Markdown content={result} />
               </div>
-              <button onClick={() => setExpanded(e => !e)}
-                className="mt-2.5 flex items-center space-x-1 text-xs font-semibold transition-colors"
-                style={{ color }}>
-                {expanded ? <><ChevronUp className="w-3.5 h-3.5" /><span>Show less</span></>
-                           : <><ChevronDown className="w-3.5 h-3.5" /><span>Show full output</span></>}
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className="mt-2.5 flex items-center space-x-1 text-xs font-semibold transition-colors cursor-pointer"
+                style={{ color }}
+              >
+                {expanded
+                  ? <><ChevronUp className="w-3.5 h-3.5" /><span>Show less</span></>
+                  : <><ChevronDown className="w-3.5 h-3.5" /><span>Show full output</span></>
+                }
               </button>
             </>
           )}
@@ -150,7 +178,9 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
       {/* Idle State */}
       {!result && !error && !loading && (
         <div className="px-5 py-5 text-center">
-          <p className="text-xs text-slate-600 italic">No output yet. Press <strong className="text-slate-500">Run Agent</strong> to start.</p>
+          <p className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
+            No output yet. Press <strong style={{ color: 'var(--text-tertiary)' }}>Run Agent</strong> to start.
+          </p>
         </div>
       )}
 
@@ -163,7 +193,7 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
                 style={{ background: color, animationDelay: `${i * 150}ms` }} />
             ))}
           </div>
-          <span className="text-xs text-slate-500">Agent is reasoning…</span>
+          <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Agent is reasoning…</span>
         </div>
       )}
     </div>
@@ -179,31 +209,50 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
 
   const rec = result && ['BUY', 'HOLD', 'SELL'].find(r => result.toUpperCase().includes(r));
   const recColor = rec === 'BUY' ? '#10b981' : rec === 'SELL' ? '#ef4444' : '#f59e0b';
+  const recBadge = rec === 'BUY' ? 'badge-green' : rec === 'SELL' ? 'badge-red' : 'badge-amber';
 
   return (
-    <div className="rounded-2xl overflow-hidden"
+    <div
+      className="card rounded-2xl overflow-hidden transition-all duration-300"
       style={{
-        background: 'linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.06))',
-        border: `1px solid ${result ? 'rgba(59,130,246,0.35)' : 'rgba(59,130,246,0.15)'}`,
-        boxShadow: result ? '0 0 30px rgba(59,130,246,0.12)' : 'none',
-      }}>
+        background: 'var(--bg-card)',
+        borderImage: result
+          ? 'linear-gradient(135deg, rgba(79,139,255,0.5), rgba(124,58,237,0.4)) 1'
+          : 'none',
+        border: result ? undefined : '1px solid var(--border-subtle)',
+        boxShadow: result ? 'var(--shadow-card-hover), var(--shadow-glow-blue)' : 'var(--shadow-card)',
+      }}
+    >
+      {/* Gradient top accent */}
+      <div
+        className="h-1"
+        style={{ background: 'var(--gradient-primary)' }}
+      />
 
-      <div className="px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div
+        className="px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
+        style={{ borderBottom: '1px solid var(--border-subtle)' }}
+      >
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)' }}>
-            <Users className="w-6 h-6 text-blue-400" />
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'rgba(79, 139, 255, 0.1)',
+              border: '1px solid rgba(79, 139, 255, 0.2)',
+            }}
+          >
+            <Users className="w-6 h-6" style={{ color: 'var(--accent-blue)' }} />
           </div>
           <div>
-            <p className="text-base font-bold text-white">Full Multi-Agent Crew</p>
-            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">News → Technical → Risk → Fundamental → Portfolio → CIO recommendation</p>
+            <p className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>Full Multi-Agent Crew</p>
+            <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
+              News → Technical → Risk → Fundamental → Portfolio → CIO recommendation
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-between md:justify-end space-x-3 mt-2 md:mt-0">
           {rec && (
-            <span className="px-4 py-1.5 rounded-full text-sm font-black"
-              style={{ background: `${recColor}20`, color: recColor, border: `1px solid ${recColor}40` }}>
+            <span className={`badge ${recBadge} text-sm font-black px-4 py-1.5`}>
               {rec}
             </span>
           )}
@@ -222,7 +271,7 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
 
       <div className="px-6 py-5">
         {!result && !error && !loading && (
-          <p className="text-sm text-slate-600 italic text-center py-4">
+          <p className="text-sm italic text-center py-4" style={{ color: 'var(--text-muted)' }}>
             Enter a ticker above and run the full crew to get a comprehensive investment recommendation from all agents.
           </p>
         )}
@@ -236,40 +285,59 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
                 { icon: BookOpen,   color: '#ec4899', d: '450ms' },
                 { icon: Briefcase,  color: '#10b981', d: '600ms' },
                 { icon: Users,      color: '#60a5fa', d: '750ms' },
-              ].map(({ icon: Icon, color, d }, i) => (
+              ].map(({ icon: AgIcon, color: c, d }, i) => (
                 <div key={i} className="flex flex-col items-center space-y-2">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center animate-pulse"
-                    style={{ background: `${color}15`, border: `1px solid ${color}30`, animationDelay: d }}>
-                    <Icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" style={{ color }} />
+                    style={{ background: `${c}12`, border: `1px solid ${c}25`, animationDelay: d }}>
+                    <AgIcon className="w-4.5 h-4.5 sm:w-5 sm:h-5" style={{ color: c }} />
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-slate-400">All 6 agents are deliberating… this may take 60–120s</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              All 6 agents are deliberating… this may take 60–120s
+            </p>
             <div className="flex space-x-1.5">
               {[0,1,2,3,4].map(i => (
-                <div key={i} className="w-2 h-2 rounded-full bg-blue-500 animate-bounce"
-                  style={{ animationDelay: `${i*100}ms` }} />
+                <div key={i} className="w-2 h-2 rounded-full animate-bounce"
+                  style={{ background: 'var(--accent-blue)', animationDelay: `${i*100}ms` }} />
               ))}
             </div>
           </div>
         )}
         {error && (
-          <div className="flex items-start space-x-2 text-red-400 text-xs p-4 rounded-xl"
-            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+          <div
+            className="flex items-start space-x-2 text-xs p-4 rounded-xl"
+            style={{
+              background: 'rgba(251, 113, 133, 0.08)',
+              border: '1px solid rgba(251, 113, 133, 0.2)',
+              color: 'var(--accent-rose)',
+            }}
+          >
             <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" /><span>{error}</span>
           </div>
         )}
         {result && (
           <>
-            <div className={`text-slate-200 ${!expanded ? 'max-h-60 overflow-hidden' : ''}`}
-              style={{ maskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none' }}>
+            <div
+              className={`${!expanded ? 'max-h-60 overflow-hidden' : ''}`}
+              style={{
+                color: 'var(--text-secondary)',
+                maskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none',
+                WebkitMaskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none',
+              }}
+            >
               <Markdown content={result} />
             </div>
-            <button onClick={() => setExpanded(e => !e)}
-              className="mt-3 flex items-center space-x-1.5 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">
-              {expanded ? <><ChevronUp className="w-4 h-4" /><span>Collapse</span></>
-                        : <><ChevronDown className="w-4 h-4" /><span>Expand full recommendation</span></>}
+            <button
+              onClick={() => setExpanded(e => !e)}
+              className="mt-3 flex items-center space-x-1.5 text-sm font-semibold transition-colors cursor-pointer"
+              style={{ color: 'var(--accent-blue)' }}
+            >
+              {expanded
+                ? <><ChevronUp className="w-4 h-4" /><span>Collapse</span></>
+                : <><ChevronDown className="w-4 h-4" /><span>Expand full recommendation</span></>
+              }
             </button>
           </>
         )}
@@ -282,6 +350,7 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
 // Stock Analysis Page
 // ─────────────────────────────────────────────────────────────────────────────
 export default function StockAnalysis() {
+  const { isDark } = useTheme();
   const [ticker, setTicker] = useState('');
   const [companyName, setCompanyName] = useState('');
 
@@ -315,38 +384,59 @@ export default function StockAnalysis() {
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 space-y-6 animate-fade-up">
+    <div className="p-4 sm:p-6 md:p-8 space-y-8 animate-fade-up">
 
-      {/* Input Card */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-center space-x-2 mb-5">
-          <BarChart3 className="w-5 h-5 text-blue-400" />
-          <h2 className="text-sm font-bold text-white">Configure Analysis</h2>
+      {/* ── Page Header ─────────────────────────────────────────────────────── */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+          Stock <span className="gradient-text">Analysis</span>
+        </h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>
+          Run AI-powered agents individually or as a coordinated crew for comprehensive insights.
+        </p>
+      </div>
+
+      {/* ── Configure Analysis Card ─────────────────────────────────────────── */}
+      <div className="card p-6">
+        <div className="flex items-center space-x-2.5 mb-5">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'rgba(79, 139, 255, 0.1)' }}
+          >
+            <BarChart3 className="w-4 h-4" style={{ color: 'var(--accent-blue)' }} />
+          </div>
+          <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Configure Analysis</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label className="text-xs text-slate-500 font-semibold uppercase tracking-widest block mb-2">Stock Ticker *</label>
+            <label className="label" htmlFor="ticker-input">Stock Ticker *</label>
             <input
               id="ticker-input"
-              className="fincon-input"
+              className="input-field"
               value={ticker}
               onChange={e => setTicker(e.target.value.toUpperCase())}
               placeholder="AAPL"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 font-semibold uppercase tracking-widest block mb-2">Company Name</label>
+            <label className="label" htmlFor="company-input">Company Name</label>
             <input
               id="company-input"
-              className="fincon-input"
+              className="input-field"
               value={companyName}
               onChange={e => setCompanyName(e.target.value)}
               placeholder="Apple Inc."
             />
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <p className="text-xs text-slate-600">Run agents individually or launch the full crew at once</p>
+
+        <hr className="divider mt-5" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5">
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Run agents individually or launch the full crew at once
+          </p>
           <button
             onClick={runAll}
             disabled={!ticker || Object.values(states).some(s => s.loading)}
@@ -358,9 +448,9 @@ export default function StockAnalysis() {
         </div>
       </div>
 
-      {/* Individual Agents */}
+      {/* ── Individual Agents ───────────────────────────────────────────────── */}
       <div>
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Individual Agents</h3>
+        <h3 className="label mb-4">Individual Agents</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {AGENTS.map(agent => (
             <AgentCard
@@ -375,9 +465,9 @@ export default function StockAnalysis() {
         </div>
       </div>
 
-      {/* Full Crew */}
+      {/* ── Full Crew ───────────────────────────────────────────────────────── */}
       <div>
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Full Multi-Agent Crew</h3>
+        <h3 className="label mb-4">Full Multi-Agent Crew</h3>
         <FullCrewCard
           state={states.full}
           ticker={ticker}

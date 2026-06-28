@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { PieChart as RPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import Markdown from '../components/Markdown';
+import { useTheme } from '../context/ThemeContext';
 
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -16,9 +17,14 @@ const CUSTOM_TOOLTIP = ({ active, payload }) => {
   if (active && payload?.length) {
     const d = payload[0].payload;
     return (
-      <div className="glass rounded-xl px-3 py-2 text-xs">
-        <p className="font-bold text-white">{d.ticker}</p>
-        <p className="text-slate-400">{d.weight}% · ${d.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+      <div
+        className="card px-3 py-2 text-xs"
+        style={{ minWidth: 120 }}
+      >
+        <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{d.ticker}</p>
+        <p style={{ color: 'var(--text-tertiary)' }}>
+          {d.weight}% · ${d.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        </p>
       </div>
     );
   }
@@ -26,6 +32,8 @@ const CUSTOM_TOOLTIP = ({ active, payload }) => {
 };
 
 export default function Portfolio() {
+  const { isDark } = useTheme();
+
   const [portfolios, setPortfolios] = useState([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState(null);
   const [holdings, setHoldings] = useState([]);
@@ -171,32 +179,47 @@ export default function Portfolio() {
   }));
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 space-y-6 animate-fade-up">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-up">
 
-      {/* Portfolio Selector & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass p-4 rounded-2xl">
+      {/* ─── Portfolio Selector & Controls ─── */}
+      <div
+        className="card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div className="flex flex-wrap items-center gap-3">
-          <Briefcase className="w-5 h-5 text-blue-400" />
-          <span className="text-sm font-bold text-white">Active Portfolio:</span>
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'rgba(79, 139, 255, 0.12)',
+              border: '1px solid rgba(79, 139, 255, 0.2)',
+            }}
+          >
+            <Briefcase className="w-[17px] h-[17px]" style={{ color: 'var(--accent-blue)' }} />
+          </div>
+          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+            Active Portfolio:
+          </span>
           {portfolios.length > 0 ? (
             <select
               value={selectedPortfolio?.id || ''}
               onChange={handleSelectPortfolio}
-              className="bg-slate-900 border border-slate-800 text-white rounded-xl px-3 py-1.5 text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="input-field !w-auto !py-2 !px-3 text-sm font-semibold"
+              style={{ minWidth: 140 }}
             >
               {portfolios.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
           ) : (
-            <span className="text-xs text-slate-500 italic">No portfolios exist. Please create one.</span>
+            <span className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
+              No portfolios exist. Please create one.
+            </span>
           )}
         </div>
 
-        <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-end">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
           <button 
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="btn-secondary py-2 px-3 text-xs flex items-center space-x-1.5 flex-1 sm:flex-initial justify-center"
+            className="btn-secondary !py-2 !px-3 !text-xs flex-1 sm:flex-initial"
           >
             <FolderPlus className="w-4 h-4" />
             <span>New Portfolio</span>
@@ -205,88 +228,157 @@ export default function Portfolio() {
           {selectedPortfolio && (
             <button 
               onClick={handleDeletePortfolio}
-              className="btn-secondary py-2 px-3 text-xs text-red-400 hover:text-red-300 border-red-500/20 flex items-center space-x-1.5 flex-1 sm:flex-initial justify-center"
+              className="btn-danger !py-2 !px-3 !text-xs flex-1 sm:flex-initial"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Delete Portfolio</span>
+              <span>Delete</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Create Portfolio Form */}
+      {/* ─── Create Portfolio Form ─── */}
       {showCreateForm && (
-        <form onSubmit={handleCreatePortfolio} className="glass p-5 rounded-2xl flex items-center space-x-3 max-w-md animate-fade-in">
+        <form
+          onSubmit={handleCreatePortfolio}
+          className="card p-5 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-lg animate-fade-up"
+        >
           <input
             type="text"
-            className="fincon-input flex-1 py-2"
+            className="input-field !py-2 flex-1"
             placeholder="Portfolio Name (e.g. Growth)"
             value={newPortfolioName}
             onChange={e => setNewPortfolioName(e.target.value)}
             required
           />
-          <button type="submit" className="btn-primary py-2 px-4 text-xs flex items-center space-x-1">
-            <Check className="w-4 h-4" />
-            <span>Create</span>
-          </button>
-          <button 
-            type="button" 
-            onClick={() => setShowCreateForm(false)} 
-            className="btn-secondary py-2 px-3 text-xs"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-primary !py-2 !px-4 !text-xs flex-1 sm:flex-initial">
+              <Check className="w-4 h-4" />
+              <span>Create</span>
+            </button>
+            <button 
+              type="button" 
+              onClick={() => setShowCreateForm(false)} 
+              className="btn-secondary !py-2 !px-3 !text-xs"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </form>
       )}
 
       {selectedPortfolio ? (
         <>
-          {/* Summary Row */}
+          {/* ─── Summary Metric Cards ─── */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="glass rounded-2xl p-5">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Portfolio Value</p>
-              <p className="text-2xl font-black text-emerald-400">
+            {/* Portfolio Value */}
+            <div
+              className="card p-5"
+              style={{ borderLeft: '3px solid var(--accent-emerald)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.12)',
+                  }}
+                >
+                  <TrendingUp className="w-4 h-4" style={{ color: 'var(--accent-emerald)' }} />
+                </div>
+                <span className="label !mb-0">Portfolio Value</span>
+              </div>
+              <p className="text-2xl font-black" style={{ color: 'var(--accent-emerald)' }}>
                 ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </p>
-              <p className="text-xs text-slate-500 mt-1">Based on purchase cost basis</p>
+              <p className="text-xs mt-1.5" style={{ color: 'var(--text-tertiary)' }}>
+                Based on purchase cost basis
+              </p>
             </div>
-            <div className="glass rounded-2xl p-5">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Total Assets</p>
-              <p className="text-2xl font-black text-blue-400">{holdings.length} positions</p>
-              <p className="text-xs text-slate-500 mt-1">Directly stored in SQLite</p>
+
+            {/* Total Assets */}
+            <div
+              className="card p-5"
+              style={{ borderLeft: '3px solid var(--accent-blue)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: 'rgba(79, 139, 255, 0.12)',
+                  }}
+                >
+                  <BarChart2 className="w-4 h-4" style={{ color: 'var(--accent-blue)' }} />
+                </div>
+                <span className="label !mb-0">Total Assets</span>
+              </div>
+              <p className="text-2xl font-black" style={{ color: 'var(--accent-blue)' }}>
+                {holdings.length} <span className="text-base font-semibold" style={{ color: 'var(--text-tertiary)' }}>positions</span>
+              </p>
+              <p className="text-xs mt-1.5" style={{ color: 'var(--text-tertiary)' }}>
+                Directly stored in SQLite
+              </p>
             </div>
-            <div className="glass rounded-2xl p-5">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Risk Assessment</p>
-              <p className="text-2xl font-black text-purple-400">Dynamic Score</p>
-              <p className="text-xs text-slate-500 mt-1">Calculated via Portfolio Agent</p>
+
+            {/* Risk Assessment */}
+            <div
+              className="card p-5"
+              style={{ borderLeft: '3px solid var(--accent-purple)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: 'rgba(167, 139, 250, 0.12)',
+                  }}
+                >
+                  <AlertTriangle className="w-4 h-4" style={{ color: 'var(--accent-purple)' }} />
+                </div>
+                <span className="label !mb-0">Risk Assessment</span>
+              </div>
+              <p className="text-2xl font-black" style={{ color: 'var(--accent-purple)' }}>
+                Dynamic Score
+              </p>
+              <p className="text-xs mt-1.5" style={{ color: 'var(--text-tertiary)' }}>
+                Calculated via Portfolio Agent
+              </p>
             </div>
           </div>
 
-          {/* Holdings & Allocation Charts */}
+          {/* ─── Holdings & Allocation Charts ─── */}
           <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
             
             {/* Holdings Table */}
-            <div className="xl:col-span-3 glass rounded-2xl overflow-hidden flex flex-col">
-              <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <h3 className="text-sm font-bold text-white">Holdings</h3>
-                <span className="badge-blue">{holdings.length} positions</span>
+            <div className="xl:col-span-3 card overflow-hidden flex flex-col">
+              <div
+                className="px-5 sm:px-6 py-4 flex items-center justify-between"
+                style={{ borderBottom: '1px solid var(--border-subtle)' }}
+              >
+                <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  Holdings
+                </h3>
+                <span className="badge badge-blue">{holdings.length} positions</span>
               </div>
               
               <div className="flex-1 overflow-x-auto">
-                <table className="fincon-table">
+                <table className="table-pro">
                   <thead>
                     <tr>
-                      <th className="pl-6">Asset</th>
+                      <th className="!pl-6">Asset</th>
                       <th>Shares</th>
                       <th>Avg Cost</th>
                       <th>Value</th>
-                      <th className="pr-6 text-right">Action</th>
+                      <th>Allocation</th>
+                      <th className="!pr-6 !text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {holdingsWithValues.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="text-center text-slate-500 italic py-8 text-xs">
+                        <td
+                          colSpan="6"
+                          className="!text-center italic !py-10"
+                          style={{ color: 'var(--text-muted)' }}
+                        >
                           No holdings inside this portfolio. Add below to begin.
                         </td>
                       </tr>
@@ -295,27 +387,76 @@ export default function Portfolio() {
                         const weight = totalValue > 0 ? ((h.value / totalValue) * 100).toFixed(1) : 0;
                         return (
                           <tr key={h.ticker}>
-                            <td className="pl-6">
-                              <div className="flex items-center space-x-3">
+                            <td className="!pl-6">
+                              <div className="flex items-center gap-3">
                                 <div 
-                                  className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                                  style={{ background: `${h.color}20`, border: `1px solid ${h.color}30`, color: h.color }}
+                                  className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0"
+                                  style={{
+                                    background: `${h.color}15`,
+                                    border: `1px solid ${h.color}30`,
+                                    color: h.color,
+                                  }}
                                 >
                                   {h.ticker.slice(0, 2)}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold text-white">{h.ticker}</p>
-                                  <p className="text-[10px] text-slate-500">Allocation: {weight}%</p>
+                                  <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                                    {h.ticker}
+                                  </p>
                                 </div>
                               </div>
                             </td>
-                            <td className="text-slate-300 text-sm font-semibold">{h.shares}</td>
-                            <td className="text-slate-300 text-sm font-semibold">${h.cost_basis.toFixed(2)}</td>
-                            <td className="text-slate-300 text-sm font-bold">${h.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                            <td className="pr-6 text-right">
+                            <td>
+                              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                {h.shares}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                ${h.cost_basis.toFixed(2)}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
+                                ${h.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </span>
+                            </td>
+                            <td style={{ minWidth: 120 }}>
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="flex-1 h-2 rounded-full overflow-hidden"
+                                  style={{ background: 'var(--border-subtle)' }}
+                                >
+                                  <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${weight}%`,
+                                      background: h.color,
+                                      opacity: 0.85,
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-xs font-semibold w-10 text-right" style={{ color: 'var(--text-tertiary)' }}>
+                                  {weight}%
+                                </span>
+                              </div>
+                            </td>
+                            <td className="!pr-6 !text-right">
                               <button 
                                 onClick={() => handleDeleteHolding(h.ticker)}
-                                className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                                className="p-1.5 rounded-lg transition-all duration-200"
+                                style={{
+                                  color: 'var(--accent-rose)',
+                                  background: 'transparent',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                }}
+                                onMouseEnter={e => {
+                                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                                }}
+                                onMouseLeave={e => {
+                                  e.currentTarget.style.background = 'transparent';
+                                }}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -329,12 +470,18 @@ export default function Portfolio() {
               </div>
 
               {/* Add Holding Form */}
-              <div className="p-4 bg-slate-950/40 border-t border-slate-900">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Add or Edit Asset Position</p>
+              <div
+                className="p-4 sm:p-5"
+                style={{
+                  borderTop: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-elevated)',
+                }}
+              >
+                <p className="label mb-3">Add or Edit Asset Position</p>
                 <form onSubmit={handleAddHolding} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <input
                     type="text"
-                    className="fincon-input text-xs py-2"
+                    className="input-field !py-2 !text-sm"
                     placeholder="Ticker (e.g. AAPL)"
                     value={ticker}
                     onChange={e => setTicker(e.target.value)}
@@ -343,7 +490,7 @@ export default function Portfolio() {
                   <input
                     type="number"
                     step="any"
-                    className="fincon-input text-xs py-2"
+                    className="input-field !py-2 !text-sm"
                     placeholder="Shares"
                     value={shares}
                     onChange={e => setShares(e.target.value)}
@@ -352,13 +499,13 @@ export default function Portfolio() {
                   <input
                     type="number"
                     step="any"
-                    className="fincon-input text-xs py-2"
+                    className="input-field !py-2 !text-sm"
                     placeholder="Avg Cost Basis"
                     value={costBasis}
                     onChange={e => setCostBasis(e.target.value)}
                     required
                   />
-                  <button type="submit" className="btn-primary py-2 px-3 text-xs flex items-center justify-center space-x-1.5">
+                  <button type="submit" className="btn-primary !py-2 !px-3 !text-xs">
                     <PlusCircle className="w-4 h-4" />
                     <span>Save Position</span>
                   </button>
@@ -367,21 +514,27 @@ export default function Portfolio() {
             </div>
 
             {/* Allocation Chart */}
-            <div className="xl:col-span-2 glass rounded-2xl p-6 flex flex-col justify-between">
+            <div className="xl:col-span-2 card p-5 sm:p-6 flex flex-col justify-between">
               <div>
-                <h3 className="text-sm font-bold text-white mb-4">Portfolio Allocation</h3>
+                <div className="flex items-center gap-2 mb-5">
+                  <PieChart className="w-4 h-4" style={{ color: 'var(--accent-purple)' }} />
+                  <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                    Portfolio Allocation
+                  </h3>
+                </div>
                 {pieChartData.length > 0 ? (
-                  <div style={{ height: 200 }}>
+                  <div style={{ height: 210 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <RPieChart>
                         <Pie 
                           data={pieChartData} 
                           cx="50%" 
                           cy="50%" 
-                          innerRadius={50} 
-                          outerRadius={80}
+                          innerRadius={55} 
+                          outerRadius={85}
                           dataKey="value" 
                           stroke="none"
+                          paddingAngle={2}
                         >
                           {pieChartData.map((h, i) => (
                             <Cell key={i} fill={h.color} opacity={0.85} />
@@ -392,48 +545,82 @@ export default function Portfolio() {
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="h-[200px] flex items-center justify-center text-slate-500 text-xs italic">
+                  <div
+                    className="flex items-center justify-center text-xs italic"
+                    style={{ height: 210, color: 'var(--text-muted)' }}
+                  >
                     Add holdings to visualize allocation
                   </div>
                 )}
               </div>
               
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 max-h-[140px] overflow-y-auto">
+              {/* Legend */}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mt-5 max-h-[150px] overflow-y-auto">
                 {pieChartData.map(h => (
-                  <div key={h.ticker} className="flex items-center space-x-2">
-                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: h.color }} />
-                    <span className="text-xs text-slate-400 truncate">{h.ticker}</span>
-                    <span className="text-xs text-slate-600 ml-auto">{h.weight}%</span>
+                  <div key={h.ticker} className="flex items-center gap-2">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{ background: h.color }}
+                    />
+                    <span className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+                      {h.ticker}
+                    </span>
+                    <span className="text-xs ml-auto font-semibold" style={{ color: 'var(--text-tertiary)' }}>
+                      {h.weight}%
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* AI Portfolio Rebalancing Analysis */}
-          <div className="glass rounded-2xl overflow-hidden">
-            <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <div className="flex items-center space-x-3">
+          {/* ─── AI Portfolio Manager Agent ─── */}
+          <div className="card overflow-hidden">
+            {/* Header */}
+            <div
+              className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              style={{ borderBottom: '1px solid var(--border-subtle)' }}
+            >
+              <div className="flex items-center gap-3">
                 <div 
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)' }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1px solid rgba(16, 185, 129, 0.25)',
+                  }}
                 >
-                  <Briefcase className="w-4.5 h-4.5 text-emerald-400" style={{ width: 17, height: 17 }} />
+                  <Briefcase className="w-[18px] h-[18px]" style={{ color: 'var(--accent-emerald)' }} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white">Portfolio Manager Agent</p>
-                  <p className="text-xs text-slate-500">AI-powered rebalancing and diversification analysis</p>
+                  <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                    Portfolio Manager Agent
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                    AI-powered rebalancing and diversification analysis
+                  </p>
                 </div>
               </div>
               <button
                 onClick={runAnalysis}
                 disabled={holdings.length === 0 || state.loading}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(135deg,#059669,#0d9488)', boxShadow: '0 4px 15px rgba(5,150,105,0.3)', whiteSpace: 'nowrap' }}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{
+                  background: 'var(--gradient-success)',
+                  boxShadow: 'var(--shadow-glow-emerald)',
+                  whiteSpace: 'nowrap',
+                  border: 'none',
+                  cursor: holdings.length === 0 || state.loading ? 'not-allowed' : 'pointer',
+                }}
               >
                 {state.loading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div
+                      className="w-4 h-4 rounded-full animate-spin"
+                      style={{
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderTopColor: 'white',
+                      }}
+                    />
                     <span>Analyzing…</span>
                   </>
                 ) : (
@@ -445,11 +632,16 @@ export default function Portfolio() {
               </button>
             </div>
             
-            <div className="px-6 py-5">
+            {/* Body */}
+            <div className="px-5 sm:px-6 py-5">
               {state.error && (
                 <div 
-                  className="flex items-start space-x-2 text-red-400 text-xs p-3 rounded-xl"
-                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}
+                  className="flex items-start gap-2 text-xs p-3.5 rounded-xl"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.08)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    color: 'var(--accent-rose)',
+                  }}
                 >
                   <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
                   <span>{state.error}</span>
@@ -458,14 +650,25 @@ export default function Portfolio() {
               {state.result && (
                 <>
                   <div 
-                    className={`text-sm text-slate-200 leading-relaxed ${!expanded ? 'max-h-48 overflow-hidden' : ''}`}
-                    style={{ maskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none' }}
+                    className={`text-sm leading-relaxed ${!expanded ? 'max-h-48 overflow-hidden' : ''}`}
+                    style={{
+                      color: 'var(--text-secondary)',
+                      maskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none',
+                      WebkitMaskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none',
+                    }}
                   >
                     <Markdown content={state.result} />
                   </div>
                   <button 
                     onClick={() => setExpanded(e => !e)}
-                    className="mt-3 flex items-center space-x-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+                    className="mt-3 flex items-center gap-1.5 text-xs font-semibold transition-colors"
+                    style={{
+                      color: 'var(--accent-emerald)',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
                   >
                     {expanded ? (
                       <>
@@ -482,7 +685,7 @@ export default function Portfolio() {
                 </>
               )}
               {!state.result && !state.error && !state.loading && (
-                <p className="text-sm text-slate-600 italic">
+                <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>
                   {holdings.length === 0 
                     ? "Add asset positions above to activate Portfolio Agent analysis."
                     : "Run the agent to receive institutional-grade rebalancing advice."}
@@ -492,7 +695,10 @@ export default function Portfolio() {
           </div>
         </>
       ) : (
-        <div className="glass rounded-2xl p-12 text-center text-slate-500 italic">
+        <div
+          className="card p-12 text-center italic"
+          style={{ color: 'var(--text-muted)' }}
+        >
           No active portfolio available. Click "New Portfolio" above to create one.
         </div>
       )}
