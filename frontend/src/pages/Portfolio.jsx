@@ -6,6 +6,7 @@ import {
   Plus, Trash2, BarChart2, PlusCircle, Check, X, FolderPlus
 } from 'lucide-react';
 import { PieChart as RPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import Markdown from '../components/Markdown';
 
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -411,21 +412,23 @@ export default function Portfolio() {
 
           {/* AI Portfolio Rebalancing Analysis */}
           <div className="glass rounded-2xl overflow-hidden">
-            <div className="px-6 py-4 flex items-center space-x-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <div 
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)' }}
-              >
-                <Briefcase className="w-4.5 h-4.5 text-emerald-400" style={{ width: 17, height: 17 }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-white">Portfolio Manager Agent</p>
-                <p className="text-xs text-slate-500">AI-powered rebalancing and diversification analysis</p>
+            <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="flex items-center space-x-3">
+                <div 
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)' }}
+                >
+                  <Briefcase className="w-4.5 h-4.5 text-emerald-400" style={{ width: 17, height: 17 }} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Portfolio Manager Agent</p>
+                  <p className="text-xs text-slate-500">AI-powered rebalancing and diversification analysis</p>
+                </div>
               </div>
               <button
                 onClick={runAnalysis}
                 disabled={holdings.length === 0 || state.loading}
-                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg,#059669,#0d9488)', boxShadow: '0 4px 15px rgba(5,150,105,0.3)', whiteSpace: 'nowrap' }}
               >
                 {state.loading ? (
@@ -455,10 +458,10 @@ export default function Portfolio() {
               {state.result && (
                 <>
                   <div 
-                    className={`text-sm text-slate-200 leading-relaxed whitespace-pre-wrap ${!expanded ? 'max-h-48 overflow-hidden' : ''}`}
+                    className={`text-sm text-slate-200 leading-relaxed ${!expanded ? 'max-h-48 overflow-hidden' : ''}`}
                     style={{ maskImage: !expanded ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none' }}
                   >
-                    {state.result}
+                    <Markdown content={state.result} />
                   </div>
                   <button 
                     onClick={() => setExpanded(e => !e)}
