@@ -268,7 +268,8 @@ class FinancialCrew:
                 f"Classify the trend and generate a Trend Strength Score and Signal Confidence Score."
             ),
             expected_output=(
-                f"An institutional-grade Technical Analysis Report for {ticker} that MUST include:\n"
+                f"An institutional-grade Technical Analysis Report for {ticker} formatted as clean Markdown (no raw JSON). "
+                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
                 f"1. PRICE & INDICATOR SUMMARY: Current Price, RSI(14) with interpretation, MACD Line/Signal/Histogram with interpretation, SMA20, SMA50, EMA12, EMA26, Bollinger Bands (Upper/Middle/Lower), ATR(14)\n"
                 f"2. VOLUME ANALYSIS: Current Volume, 20D Average Volume, Volume Ratio, Volume Trend\n"
                 f"3. SUPPORT & RESISTANCE: Pivot Point, R1, R2, S1, S2, 52W High, 52W Low\n"
@@ -299,7 +300,8 @@ class FinancialCrew:
                 f"Include the complete Methodology section."
             ),
             expected_output=(
-                f"An institutional-grade Risk Assessment Report for {ticker} that MUST include:\n"
+                f"An institutional-grade Risk Assessment Report for {ticker} formatted as clean Markdown (no raw JSON). "
+                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
                 f"1. RISK METRICS TABLE: Annualized Volatility, Beta, Alpha (Annualized), Max Drawdown, Sharpe Ratio, Sortino Ratio, Downside Deviation, Benchmark Correlation\n"
                 f"2. VALUE AT RISK: VaR (95%, 1-Day) with COMPLIANT interpretation: 'Based on historical return distributions, 95% of observed returns were better than X%, while 5% were worse. Actual future losses may exceed this estimate.'\n"
                 f"3. CVAR / EXPECTED SHORTFALL: CVaR (95%) value\n"
@@ -324,7 +326,8 @@ class FinancialCrew:
         task = Task(
             description=f"Use your tool to fetch all fundamental and financial data for {ticker}. Assess valuation and health.",
             expected_output=(
-                f"An institutional-grade Fundamental Analysis Report for {ticker} that MUST include:\n"
+                f"An institutional-grade Fundamental Analysis Report for {ticker} formatted as clean Markdown (no raw JSON). "
+                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
                 f"1. FINANCIAL METRICS: Revenue Growth, EPS Growth, Operating Margin, Free Cash Flow, Debt Ratio, ROE, ROA\n"
                 f"2. VALUATION SUMMARY: P/E, Forward P/E, PEG, Price/Sales, EV/EBITDA\n"
                 f"3. COMPETITIVE ANALYSIS: Market Position, Moat, Competitor Comparison\n"
@@ -351,7 +354,8 @@ class FinancialCrew:
                 "Provide concrete rebalancing suggestions and highlight concentration risks."
             ),
             expected_output=(
-                "A detailed portfolio review report containing:\n"
+                "A detailed portfolio review report formatted as clean Markdown (no raw JSON). "
+                "Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST contain:\n"
                 "1. PORTFOLIO VALUE: total value of the active portfolio\n"
                 "2. DIVERSIFICATION SCORE: 0-10 score with explanation\n"
                 "3. SECTOR EXPOSURE: percentage of allocation by sector\n"
@@ -447,7 +451,8 @@ class FinancialCrew:
                 f"Classify the trend and generate a Trend Strength Score and Signal Confidence Score."
             ),
             expected_output=(
-                f"An institutional-grade Technical Analysis Report for {company} ({ticker}) that MUST include:\n"
+                f"An institutional-grade Technical Analysis Report for {company} ({ticker}) formatted as clean Markdown (no raw JSON). "
+                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
                 f"1. PRICE & INDICATOR SUMMARY: Current Price, RSI(14) with interpretation, MACD Line/Signal/Histogram with interpretation, SMA20, SMA50, EMA12, EMA26, Bollinger Bands, ATR(14)\n"
                 f"2. VOLUME ANALYSIS: Current Volume, 20D Average Volume, Volume Ratio, Volume Trend\n"
                 f"3. SUPPORT & RESISTANCE: Pivot Point, R1, R2, S1, S2, 52W High, 52W Low\n"
@@ -466,7 +471,8 @@ class FinancialCrew:
                 f"Include the complete Methodology section."
             ),
             expected_output=(
-                f"An institutional-grade Risk Assessment Report for {company} ({ticker}) that MUST include:\n"
+                f"An institutional-grade Risk Assessment Report for {company} ({ticker}) formatted as clean Markdown (no raw JSON). "
+                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
                 f"1. RISK METRICS TABLE: Volatility, Beta, Alpha, Max Drawdown, Sharpe, Sortino, Downside Deviation, Correlation\n"
                 f"2. VALUE AT RISK (compliant): 'Based on historical return distributions, 95% of observed returns were better than X%, while 5% were worse. Actual future losses may exceed this estimate.'\n"
                 f"3. CVAR / EXPECTED SHORTFALL\n"
@@ -480,7 +486,8 @@ class FinancialCrew:
         fund_task = Task(
             description=f"Use your tool to fetch all fundamental and financial data for {ticker}. Assess valuation metrics and operational growth.",
             expected_output=(
-                f"An institutional-grade Fundamental Analysis Report for {company} ({ticker}) that MUST include:\n"
+                f"An institutional-grade Fundamental Analysis Report for {company} ({ticker}) formatted as clean Markdown (no raw JSON). "
+                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
                 f"1. FINANCIAL METRICS: Revenue Growth, EPS Growth, Operating Margin, Free Cash Flow, Debt Ratio, ROE, ROA\n"
                 f"2. VALUATION SUMMARY: P/E, Forward P/E, PEG, Price/Sales, EV/EBITDA\n"
                 f"3. COMPETITIVE ANALYSIS: Market Position, Moat, Competitor Comparison\n"
@@ -496,7 +503,8 @@ class FinancialCrew:
                 "Highlight concentration risks and suggest rebalancing."
             ),
             expected_output=(
-                "A detailed portfolio review report containing:\n"
+                "A detailed portfolio review report formatted as clean Markdown (no raw JSON). "
+                "Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST contain:\n"
                 "1. PORTFOLIO VALUE: total value of the active portfolio\n"
                 "2. DIVERSIFICATION SCORE: 0-10 score with explanation\n"
                 "3. SECTOR EXPOSURE: percentage of allocation by sector\n"
