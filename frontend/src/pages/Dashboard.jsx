@@ -104,10 +104,10 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="p-8 space-y-8 animate-fade-up">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 animate-fade-up">
 
       {/* Hero Banner */}
-      <div className="relative rounded-2xl overflow-hidden p-7"
+      <div className="relative rounded-2xl overflow-hidden p-5 sm:p-7"
         style={{
           background: 'linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(124,58,237,0.12) 50%, rgba(16,185,129,0.08) 100%)',
           border: '1px solid rgba(59,130,246,0.2)'
@@ -122,24 +122,24 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <Sparkles className="w-4 h-4 text-blue-400" />
-              <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest">AI-Powered Intelligence</span>
+              <span className="text-[10px] sm:text-xs font-semibold text-blue-400 uppercase tracking-widest">AI-Powered Intelligence</span>
             </div>
-            <h2 className="text-2xl font-black text-white mb-1">Welcome to FINCON AI</h2>
-            <p className="text-slate-400 text-sm max-w-lg">
+            <h2 className="text-xl sm:text-2xl font-black text-white mb-1">Welcome to FINCON AI</h2>
+            <p className="text-slate-400 text-xs sm:text-sm max-w-lg leading-relaxed">
                Your multi-agent financial intelligence platform. Run News, Technical, Risk, Fundamental &amp; Portfolio agents individually or launch the full CIO crew for comprehensive analysis.
             </p>
-            <div className="flex items-center space-x-3 mt-5">
-              <button onClick={() => navigate('/analysis')} className="btn-primary flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-3 mt-5">
+              <button onClick={() => navigate('/analysis')} className="btn-primary flex items-center space-x-2 py-2 sm:py-2.5">
                 <Zap className="w-4 h-4" />
                 <span>Start Analysis</span>
               </button>
-              <button onClick={() => navigate('/agents')} className="btn-secondary flex items-center space-x-2">
+              <button onClick={() => navigate('/agents')} className="btn-secondary flex items-center space-x-2 py-2 sm:py-2.5">
                 <Bot className="w-4 h-4" />
                 <span>View Agents</span>
               </button>
             </div>
           </div>
-          <div className="hidden lg:flex items-center space-x-1 opacity-80">
+          <div className="hidden lg:flex items-center space-x-1 opacity-80 flex-shrink-0">
             {[
               { icon: Newspaper, c: '#3b82f6', label: 'News' },
               { icon: TrendingUp, c: '#8b5cf6', label: 'Tech' },
@@ -149,7 +149,7 @@ export default function Dashboard() {
             ].map(({ icon: Icon, c, label }, i) => (
               <div key={label} className="flex flex-col items-center space-y-2 px-3">
                 <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                  style={{ background: `${c}15`, border: `1px solid ${c}30` }}>
+                   style={{ background: `${c}15`, border: `1px solid ${c}30` }}>
                   <Icon className="w-4.5 h-4.5" style={{ color: c, width: 17, height: 17 }} />
                 </div>
                 <span className="text-[10px] text-slate-500">{label}</span>
@@ -168,7 +168,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Analyses Today"   value={stats.analyses_today}   sub="Based on history logs"     icon={BarChart2}  color="#3b82f6" />
         <StatCard label="Active Agents"    value="6"    sub="All systems online"     icon={Bot}        color="#10b981" />
         <StatCard label="Avg Confidence"   value={`${stats.avg_confidence}%`}  sub="Across all sessions"   icon={Activity}   color="#8b5cf6" />
@@ -181,7 +181,7 @@ export default function Dashboard() {
           <h3 className="text-sm font-bold text-white">Market Overview</h3>
           <span className="text-xs text-slate-500">Live data · refreshes every 15s</span>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {MARKET_INDICES.map(idx => <MarketCard key={idx.name} index={idx} />)}
         </div>
       </section>
@@ -189,49 +189,51 @@ export default function Dashboard() {
       {/* Recent Sessions + Agent Activity */}
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
         {/* Recent Sessions */}
-        <div className="xl:col-span-3 glass rounded-2xl overflow-hidden">
+        <div className="xl:col-span-3 glass rounded-2xl overflow-hidden flex flex-col">
           <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <h3 className="text-sm font-bold text-white">Recent Analysis Sessions</h3>
+            <h3 className="text-sm font-bold text-white">Recent Sessions</h3>
             <button onClick={() => navigate('/history')} className="text-xs text-blue-400 hover:text-blue-300 flex items-center space-x-1 transition-colors">
               <span>View all</span><ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <table className="fincon-table px-6">
-            <thead>
-              <tr>
-                <th className="pl-6">Ticker</th>
-                <th>Company</th>
-                <th>Recommendation</th>
-                <th>Confidence</th>
-                <th className="pr-6">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentSessions.length === 0 ? (
-                <tr><td colSpan="5" className="text-center text-xs text-slate-500 py-4">No recent sessions found</td></tr>
-              ) : recentSessions.map(s => (
-                <tr key={s.id} className="cursor-pointer" onClick={() => navigate('/history')}>
-                  <td className="font-bold text-white">{s.ticker}</td>
-                  <td className="text-slate-400">{s.company}</td>
-                  <td>
-                    <span className={s.rec === 'BUY' ? 'badge-green' : s.rec === 'SELL' ? 'badge-red' : 'badge-amber'}>
-                      {s.rec}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex-1 h-1.5 rounded-full bg-slate-800 max-w-[80px]">
-                        <div className="h-full rounded-full"
-                          style={{ width: `${s.score}%`, background: s.score > 80 ? '#10b981' : s.score > 60 ? '#f59e0b' : '#ef4444' }} />
-                      </div>
-                      <span className="text-xs text-slate-400">{s.score}%</span>
-                    </div>
-                  </td>
-                  <td className="text-slate-500 text-xs pr-6">{s.date} {s.time}</td>
+          <div className="overflow-x-auto flex-1">
+            <table className="fincon-table w-full min-w-[600px] px-6">
+              <thead>
+                <tr>
+                  <th className="pl-6">Ticker</th>
+                  <th>Company</th>
+                  <th>Recommendation</th>
+                  <th>Confidence</th>
+                  <th className="pr-6">Time</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentSessions.length === 0 ? (
+                  <tr><td colSpan="5" className="text-center text-xs text-slate-500 py-4">No recent sessions found</td></tr>
+                ) : recentSessions.map(s => (
+                  <tr key={s.id} className="cursor-pointer" onClick={() => navigate('/history')}>
+                    <td className="font-bold text-white pl-6">{s.ticker}</td>
+                    <td className="text-slate-400">{s.company}</td>
+                    <td>
+                      <span className={s.rec === 'BUY' ? 'badge-green' : s.rec === 'SELL' ? 'badge-red' : 'badge-amber'}>
+                        {s.rec}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex-1 h-1.5 rounded-full bg-slate-800 max-w-[80px]">
+                          <div className="h-full rounded-full"
+                            style={{ width: `${s.score}%`, background: s.score > 80 ? '#10b981' : s.score > 60 ? '#f59e0b' : '#ef4444' }} />
+                        </div>
+                        <span className="text-xs text-slate-400">{s.score}%</span>
+                      </div>
+                    </td>
+                    <td className="text-slate-500 text-xs pr-6">{s.date} {s.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Agent Activity */}

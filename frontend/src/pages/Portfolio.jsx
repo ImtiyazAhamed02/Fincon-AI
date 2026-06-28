@@ -170,11 +170,11 @@ export default function Portfolio() {
   }));
 
   return (
-    <div className="p-8 space-y-6 animate-fade-up">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 animate-fade-up">
 
       {/* Portfolio Selector & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass p-4 rounded-2xl">
-        <div className="flex items-center space-x-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass p-4 rounded-2xl">
+        <div className="flex flex-wrap items-center gap-3">
           <Briefcase className="w-5 h-5 text-blue-400" />
           <span className="text-sm font-bold text-white">Active Portfolio:</span>
           {portfolios.length > 0 ? (
@@ -192,10 +192,10 @@ export default function Portfolio() {
           )}
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-end">
           <button 
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="btn-secondary py-2 px-3 text-xs flex items-center space-x-1.5"
+            className="btn-secondary py-2 px-3 text-xs flex items-center space-x-1.5 flex-1 sm:flex-initial justify-center"
           >
             <FolderPlus className="w-4 h-4" />
             <span>New Portfolio</span>
@@ -204,7 +204,7 @@ export default function Portfolio() {
           {selectedPortfolio && (
             <button 
               onClick={handleDeletePortfolio}
-              className="btn-secondary py-2 px-3 text-xs text-red-400 hover:text-red-300 border-red-500/20 flex items-center space-x-1.5"
+              className="btn-secondary py-2 px-3 text-xs text-red-400 hover:text-red-300 border-red-500/20 flex items-center space-x-1.5 flex-1 sm:flex-initial justify-center"
             >
               <Trash2 className="w-4 h-4" />
               <span>Delete Portfolio</span>

@@ -42,11 +42,11 @@ export default function History() {
   );
 
   return (
-    <div className="p-8 space-y-6 animate-fade-up">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 animate-fade-up">
 
       {/* Header Controls */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center space-x-3 flex-1 max-w-sm">
+        <div className="flex items-center space-x-3 flex-1 min-w-[280px] max-w-sm">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
@@ -57,7 +57,7 @@ export default function History() {
             />
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-1 max-w-full">
           {['ALL', 'BUY', 'HOLD', 'SELL'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
@@ -76,7 +76,7 @@ export default function History() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Sessions', value: sessions.length, color: '#3b82f6' },
           { label: 'BUY Signals',   value: sessions.filter(s => s.rec === 'BUY').length,  color: '#10b981' },

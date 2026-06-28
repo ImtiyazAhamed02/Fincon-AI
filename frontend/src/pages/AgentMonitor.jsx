@@ -170,13 +170,13 @@ export default function AgentMonitor() {
   }, []);
 
   return (
-    <div className="p-8 space-y-8 animate-fade-up">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 animate-fade-up">
 
       {/* System Status Banner */}
-      <div className="glass rounded-2xl p-5 flex items-center justify-between"
+      <div className="glass rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
         style={{ border: '1px solid rgba(16,185,129,0.2)', background: 'rgba(16,185,129,0.04)' }}>
         <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)' }}>
             <Cpu className="w-5 h-5 text-emerald-400" />
           </div>
@@ -188,19 +188,19 @@ export default function AgentMonitor() {
             <p className="text-xs text-slate-500 mt-0.5">6 agents active · Gemini 2.5 Flash · CrewAI · SQLite</p>
           </div>
         </div>
-        <div className="flex items-center space-x-6 text-center">
+        <div className="flex items-center justify-between sm:justify-start w-full md:w-auto sm:space-x-8 text-center px-2">
           {[
             { label: 'Agents', value: '6', color: '#10b981' },
             { label: 'Sessions', value: String(sessionCount), color: '#3b82f6' },
             { label: 'Total Runs', value: String(totalRuns), color: '#8b5cf6' },
           ].map(s => (
-            <div key={s.label}>
+            <div key={s.label} className="flex-1 sm:flex-initial">
               <p className="text-lg font-black" style={{ color: s.color }}>{s.value}</p>
               <p className="text-[10px] text-slate-600 uppercase tracking-widest">{s.label}</p>
             </div>
           ))}
         </div>
-        <button onClick={() => navigate('/analysis')} className="btn-primary flex items-center space-x-2">
+        <button onClick={() => navigate('/analysis')} className="btn-primary flex items-center justify-center space-x-2 w-full md:w-auto">
           <Zap className="w-4 h-4" /><span>Launch Crew</span>
         </button>
       </div>
@@ -281,7 +281,7 @@ export default function AgentMonitor() {
                   </div>
                   <span className="text-xs text-slate-500 text-center whitespace-nowrap">{label}</span>
                 </div>
-                <div className="flex flex-col items-center justify-center">
+                <div className="hidden md:flex flex-col items-center justify-center">
                   <div className="flex space-x-0.5">
                     {[0, 1, 2].map(i => (
                       <div key={i} className="w-1 h-1 rounded-full bg-slate-700"
