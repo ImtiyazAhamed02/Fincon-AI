@@ -37,13 +37,13 @@ function MarketCard({ index, isDark }) {
 
   return (
     <div
-      className="card card-hover flex flex-col transition-all duration-300"
+      className="card card-hover flex flex-col transition-all duration-300 p-5"
       style={{
         borderTop: `2px solid ${index.up ? 'var(--accent-emerald)' : 'var(--accent-rose)'}`,
         minWidth: 0,
       }}
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-4">
         <div>
           <p
             className="text-[11px] font-bold uppercase tracking-widest"
@@ -63,12 +63,12 @@ function MarketCard({ index, isDark }) {
           {index.change}
         </span>
       </div>
-      <div className="h-12 -mx-1">
+      <div className="h-12 -mx-5 -mb-5 overflow-hidden rounded-b-[15px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={index.data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id={`grad-${index.name}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={strokeColor} stopOpacity={0.25} />
+                <stop offset="5%" stopColor={strokeColor} stopOpacity={0.2} />
                 <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
               </linearGradient>
             </defs>
@@ -85,7 +85,7 @@ function MarketCard({ index, isDark }) {
 function StatCard({ label, value, sub, icon: Icon, color }) {
   return (
     <div
-      className="card card-hover transition-all duration-300"
+      className="card card-hover transition-all duration-300 p-5"
       style={{
         borderLeft: `3px solid ${color}`,
       }}
