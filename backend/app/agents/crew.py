@@ -55,18 +55,32 @@ class FinancialCrew:
             role="Senior Market News Analyst",
             goal="Analyse news relevance, identify who truly benefits from each story, and write a clear beginner-friendly report.",
             backstory=(
-                "You are a Senior Market News Analyst who explains the stock market to everyday investors in plain English. "
-                "You get a structured list of news articles from your tool. Each article comes with three key labels: "
-                "Target Company (the stock being researched), Primary Beneficiary (who gains from the news), and "
-                "Primary Risk Holder (who is hurt by the news). "
-                "CRITICAL RULE: An article is ONLY positive for the target company if the target company itself is the Primary Beneficiary. "
-                "If a competitor is the Primary Beneficiary, do NOT call the news good for the target company. "
-                "NEVER use financial jargon. Write like a friendly business reporter talking to a first-time investor. "
-                "Use the tool data exactly — never invent numbers, percentages, or article headlines. "
-                "Always include: "
-                "the 'bottom_line' field from the tool as your closing summary, "
-                "the exact 'good_news', 'potential_concerns', and 'news_worth_watching' lists from the tool, "
-                "and the full 'excluded_articles' table."
+                "You are a financial news sentiment classifier for stock analysis.\n\n"
+                "When analyzing a news article for a target stock ticker (e.g., AAPL), follow these strict rules:\n\n"
+                "CLASSIFICATION RULES:\n"
+                "1. GOOD NEWS — Only classify as positive if the article DIRECTLY benefits the company:\n"
+                "   - Earnings beats, product launches, upgrades, partnerships, revenue growth\n"
+                "   - Do NOT classify analyst downgrades, executive departures, or stock drops as Good News under any circumstance\n\n"
+                "2. CONCERNING NEWS — Classify as concerning if:\n"
+                "   - Analyst downgrades (e.g., \"downgraded to Hold/Sell\")\n"
+                "   - Key executive departures to competitors\n"
+                "   - Stock price drops or sell-offs\n"
+                "   - Supply chain issues directly harming the company\n"
+                "   - Regulatory or legal threats\n\n"
+                "3. NEUTRAL — Use this when:\n"
+                "   - The impact on the target company is genuinely unclear\n"
+                "   - The article is about the broader industry, not the company directly\n"
+                "   - Mixed signals with no dominant direction\n\n"
+                "CONFLICT RESOLUTION:\n"
+                "- If an article could be both Good and Concerning, pick the DOMINANT signal\n"
+                "- Never assign the same article to two categories\n"
+                "- When in doubt, prefer Neutral over a forced positive/negative label\n\n"
+                "WHO IS AT RISK:\n"
+                "- If the article is classified as CONCERNING, \"Who is at risk\" must always include the target company\n"
+                "- Never leave \"Who is at risk: Unknown\" on a negative story\n\n"
+                "EXCLUSION CRITERIA:\n"
+                "- Only exclude articles where the target ticker is mentioned purely incidentally (e.g., in a list of 20 stocks)\n"
+                "- Do NOT exclude articles where the company is a primary subject, even if the mention is brief"
             ),
             verbose=True,
             allow_delegation=False,
@@ -443,6 +457,7 @@ class FinancialCrew:
                 f"[Copy the exact 'bottom_line' text from the tool here — do not modify it]"
             ),
             agent=news_agent,
+            async_execution=True,
         )
         tech_task = Task(
             description=(
@@ -463,6 +478,7 @@ class FinancialCrew:
                 f"8. DATA FLAGS and METHODOLOGY"
             ),
             agent=tech_agent,
+            async_execution=True,
         )
         risk_task = Task(
             description=(
@@ -495,6 +511,7 @@ class FinancialCrew:
                 f"5. VIEWS: Short-Term View, Long-Term View"
             ),
             agent=fund_agent,
+            async_execution=True,
         )
         port_task = Task(
             description=(
@@ -515,6 +532,7 @@ class FinancialCrew:
                 "If no portfolio exists, output 'No portfolio available for analysis.' without throwing errors."
             ),
             agent=port_agent,
+            async_execution=True,
         )
         manager_task = Task(
             description=(
