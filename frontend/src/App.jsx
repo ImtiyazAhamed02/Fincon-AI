@@ -101,20 +101,20 @@ function Sidebar({ isOpen, onClose }) {
                 style={({ isActive }) => ({
                   color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   background: isActive
-                    ? (isDark ? 'rgba(79, 139, 255, 0.1)' : 'rgba(59, 130, 246, 0.08)')
+                    ? (isDark ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.08)')
                     : 'transparent',
-                  borderLeft: isActive ? '3px solid var(--accent-blue)' : '3px solid transparent',
+                  borderLeft: isActive ? '3px solid var(--accent-emerald)' : '3px solid transparent',
                 })}
               >
                 {({ isActive }) => (
                   <>
                     <Icon style={{
                       width: 18, height: 18,
-                      color: isActive ? 'var(--accent-blue)' : 'var(--text-muted)',
+                      color: isActive ? 'var(--accent-emerald)' : 'var(--text-muted)',
                       transition: 'color 0.15s',
                     }} />
                     <span className="flex-1">{label}</span>
-                    {isActive && <ChevronRight className="w-3.5 h-3.5" style={{ color: 'var(--accent-blue)', opacity: 0.6 }} />}
+                    {isActive && <ChevronRight className="w-3.5 h-3.5" style={{ color: 'var(--accent-emerald)', opacity: 0.6 }} />}
                   </>
                 )}
               </NavLink>
