@@ -131,7 +131,7 @@ export default function History() {
                         <p className="text-sm font-bold text-white">{s.ticker}</p>
                         <p className="text-xs text-slate-500">{s.company}</p>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1.5 leading-relaxed max-w-lg">{s.summary}</p>
+                      <p className="text-xs text-slate-400 mt-1.5 leading-relaxed max-w-lg line-clamp-2">{s.summary}</p>
                       <div className="flex items-center space-x-3 mt-2">
                         <span className="flex items-center space-x-1 text-[10px] text-slate-600">
                           <Calendar className="w-3 h-3" /><span>{s.date} · {s.time}</span>

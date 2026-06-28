@@ -588,7 +588,7 @@ class FinancialCrew:
                     rec,
                     85,
                     json.dumps(["News", "Technical", "Risk", "Fundamental", "Portfolio", "CIO"]),
-                    str(result)[:300] + "..." if len(str(result)) > 300 else str(result),
+                    str(result),
                     f"{duration_sec}s"
                 )
             )
