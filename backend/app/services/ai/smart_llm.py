@@ -93,6 +93,7 @@ class SmartLLM(BaseChatModel):
     _lock: Any = None
     _fallback_until: float = 0.0
     _gemini_api_key: str = ""
+    _gemini_last_error: str = ""
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -100,6 +101,7 @@ class SmartLLM(BaseChatModel):
         object.__setattr__(self, "_fallback_until", 0.0)
         object.__setattr__(self, "_primary", None)
         object.__setattr__(self, "_fallback", None)
+        object.__setattr__(self, "_gemini_last_error", "No key configured")
         # Resolve Gemini API key for probing
         try:
             from app.core.config import settings
@@ -138,8 +140,10 @@ class SmartLLM(BaseChatModel):
         Uses a direct REST probe (no tenacity / no LangChain retries).
         """
         if not self._gemini_api_key:
+            object.__setattr__(self, "_gemini_last_error", "No Gemini API key configured")
             return False
         available, reason = _probe_gemini(self._gemini_api_key)
+        object.__setattr__(self, "_gemini_last_error", reason)
         if not available:
             self._activate_fallback(reason)
         return available
@@ -215,10 +219,33 @@ class SmartLLM(BaseChatModel):
                     continue
 
         logger.error(f"[SmartLLM] All Grok models exhausted. Last error: {last_error}")
-        raise Exception(
-            "Both AI providers (Gemini and Grok) are currently unavailable. "
-            "Grok daily token limits have been reached. Please try again in ~1 hour."
-        ) from last_error
+        gemini_reason = getattr(self, "_gemini_last_error", "Unknown")
+        groq_reason = str(last_error)
+        
+        is_gemini_invalid = "api_key_invalid" in gemini_reason.lower() or "invalid key" in gemini_reason.lower() or "api key not valid" in gemini_reason.lower()
+        is_groq_invalid = "invalid api key" in groq_reason.lower() or "invalid_api_key" in groq_reason.lower() or "invalid key" in groq_reason.lower()
+        
+        if is_gemini_invalid and is_groq_invalid:
+            raise Exception(
+                "Both Google Gemini and Groq API keys configured in the backend settings are invalid or expired. "
+                "Please generate fresh keys and update them in your Render dashboard environment variables."
+            )
+        elif is_gemini_invalid:
+            raise Exception(
+                f"Google Gemini API key is invalid or expired ({gemini_reason}). "
+                f"The fallback Groq provider also failed: {groq_reason}."
+            )
+        elif is_groq_invalid:
+            raise Exception(
+                f"Groq API key is invalid or expired ({groq_reason}). "
+                f"The primary Gemini provider also failed: {gemini_reason}."
+            )
+        else:
+            raise Exception(
+                f"Both AI providers (Gemini and Grok) are currently unavailable.\n"
+                f"- Gemini Status: {gemini_reason}\n"
+                f"- Grok Fallback Status: {groq_reason}"
+            ) from last_error
 
 
     # ── LangChain protocol ────────────────────────────────────────────────────
