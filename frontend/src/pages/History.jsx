@@ -281,7 +281,7 @@ export default function History() {
           xl:relative xl:transform-none xl:transition-none xl:z-0 xl:w-auto xl:max-w-none xl:shadow-none xl:h-auto xl:col-span-1
           ${selected ? 'translate-x-0' : 'translate-x-full xl:translate-x-0'}
         `}
-          style={{ background: isDark ? '#090d1f' : 'var(--bg-card)' }}
+          style={{ background: 'var(--bg-surface)' }}
         >
           <div
             className="card rounded-none xl:rounded-2xl overflow-hidden flex flex-col h-full xl:h-auto xl:sticky xl:top-4"

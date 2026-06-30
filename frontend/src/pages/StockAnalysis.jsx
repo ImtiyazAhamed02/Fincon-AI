@@ -99,9 +99,9 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
           >
             <Icon className="w-5 h-5" style={{ color }} />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{label}</p>
-            <p className="text-xs mt-0.5 truncate sm:max-w-xs md:max-w-none" style={{ color: 'var(--text-tertiary)' }}>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
               {description}
             </p>
           </div>
