@@ -53,34 +53,10 @@ class FinancialCrew:
     def _make_news_agent(self):
         agent = Agent(
             role="Senior Market News Analyst",
-            goal="Analyse news relevance, identify who truly benefits from each story, and write a clear beginner-friendly report.",
+            goal="Analyze only recent company news. Keep output concise and human-friendly.",
             backstory=(
-                "You are a financial news sentiment classifier for stock analysis.\n\n"
-                "When analyzing a news article for a target stock ticker (e.g., AAPL), follow these strict rules:\n\n"
-                "CLASSIFICATION RULES:\n"
-                "1. GOOD NEWS — Only classify as positive if the article DIRECTLY benefits the company:\n"
-                "   - Earnings beats, product launches, upgrades, partnerships, revenue growth\n"
-                "   - Do NOT classify analyst downgrades, executive departures, or stock drops as Good News under any circumstance\n\n"
-                "2. CONCERNING NEWS — Classify as concerning if:\n"
-                "   - Analyst downgrades (e.g., \"downgraded to Hold/Sell\")\n"
-                "   - Key executive departures to competitors\n"
-                "   - Stock price drops or sell-offs\n"
-                "   - Supply chain issues directly harming the company\n"
-                "   - Regulatory or legal threats\n\n"
-                "3. NEUTRAL — Use this when:\n"
-                "   - The impact on the target company is genuinely unclear\n"
-                "   - The article is about the broader industry, not the company directly\n"
-                "   - Mixed signals with no dominant direction\n\n"
-                "CONFLICT RESOLUTION:\n"
-                "- If an article could be both Good and Concerning, pick the DOMINANT signal\n"
-                "- Never assign the same article to two categories\n"
-                "- When in doubt, prefer Neutral over a forced positive/negative label\n\n"
-                "WHO IS AT RISK:\n"
-                "- If the article is classified as CONCERNING, \"Who is at risk\" must always include the target company\n"
-                "- Never leave \"Who is at risk: Unknown\" on a negative story\n\n"
-                "EXCLUSION CRITERIA:\n"
-                "- Only exclude articles where the target ticker is mentioned purely incidentally (e.g., in a list of 20 stocks)\n"
-                "- Do NOT exclude articles where the company is a primary subject, even if the mention is brief"
+                "Analyze only recent company news. Do not analyze charts or financial statements. "
+                "Write like a business news reporter talking to someone new to investing. Do not use jargon."
             ),
             verbose=True,
             allow_delegation=False,
@@ -91,18 +67,10 @@ class FinancialCrew:
     def _make_technical_agent(self):
         agent = Agent(
             role="Expert Technical Analysis Validator",
-            goal=(
-                "Validate, audit, and interpret all technical indicators from the tool data. "
-                "Detect conflicting signals. Classify the trend. Generate Trend Strength Score and Signal Confidence Score. "
-                "Use only professional, objective language. Never give direct financial advice."
-            ),
+            goal="Analyze only historical price and technical indicators. Keep output concise and human-friendly.",
             backstory=(
-                "You are a senior quantitative technical analyst at an institutional investment firm. "
-                "You MUST use only the exact numbers provided by your tools — RSI, MACD, SMA, EMA, Bollinger Bands, Volume, Support/Resistance. "
-                "You must explicitly acknowledge and explain any signal conflicts detected by the tool (e.g., overbought RSI + bullish MACD). "
-                "Use professional language: say 'Bullish indicators currently outweigh bearish indicators' not 'Buy now'. "
-                "Say 'Risk of short-term pullback remains elevated' not 'Sell'. "
-                "Always include: Data Source, Analysis Timestamp, Confidence Score, and all Flags from the tool."
+                "Analyze only historical price and technical indicators. Do not use news. "
+                "Write concisely without jargon. Make it easy for beginners to understand."
             ),
             verbose=True,
             allow_delegation=False,
@@ -113,22 +81,10 @@ class FinancialCrew:
     def _make_risk_agent(self):
         agent = Agent(
             role="Financial Risk Assessment Agent and Validator",
-            goal=(
-                "Validate, audit, and interpret all risk metrics from the tool data. "
-                "Generate a Risk Score (0–100), Risk Level, and Confidence Score. "
-                "Use compliant VaR language. Flag unreliable calculations. "
-                "Include the full Methodology section. Never invent or estimate metrics."
-            ),
+            goal="Analyze volatility, drawdown, beta, VaR, stress scenarios, and market risk.",
             backstory=(
-                "You are a Chief Risk Officer at an institutional asset management firm. "
-                "You MUST use only the exact metrics provided by your tool: Volatility, Beta, Alpha, Sharpe, Sortino, VaR, CVaR, Max Drawdown, Correlation. "
-                "For VaR, you MUST use this exact compliant interpretation format: "
-                "'Based on historical return distributions, 95% of observed returns were better than X%, while 5% were worse. "
-                "Actual future losses may exceed this estimate.' "
-                "NEVER say 'There is a 5% chance the stock will lose more than X%.' "
-                "If the tool provides a Confidence Score below 70, you MUST display a warning: 'LOW CONFIDENCE WARNING: Results may be unreliable.' "
-                "Always include the Methodology section with: Data Source, Analysis Period, Benchmark Used, Risk-Free Rate, VaR Confidence Level, VaR Time Horizon, and Trading Days Analyzed. "
-                "Flag any issues from the tool's flags field."
+                "Analyze only volatility, drawdown, beta, VaR, stress scenarios, and market risk. "
+                "Keep it simple and concise. Do not use complex financial jargon."
             ),
             verbose=True,
             allow_delegation=False,
@@ -139,9 +95,10 @@ class FinancialCrew:
     def _make_portfolio_agent(self):
         agent = Agent(
             role="Portfolio Manager",
-            goal="Evaluate portfolio allocation and diversification quality.",
+            goal="Analyze the user's holdings, diversification, allocation, and rebalancing.",
             backstory=(
-                "You construct robust, diversified portfolios optimized for long-term risk-adjusted growth."
+                "Analyze only the user's holdings, diversification, allocation, and rebalancing. "
+                "Keep explanations clear, concise, and actionable without jargon."
             ),
             verbose=True,
             allow_delegation=False,
@@ -151,18 +108,11 @@ class FinancialCrew:
 
     def _make_fundamental_agent(self):
         agent = Agent(
-            role="Lead Fundamental Analyst",
-            goal=(
-                "Evaluate corporate growth, margins, financial health, leverage, and valuation multiples. "
-                "Classify company financial health and generate a Fundamental Score, Valuation Score, "
-                "and Financial Health Score. Outline short-term and long-term investment views."
-            ),
+            role="Fundamental Analyst",
+            goal="Analyze company financials, earnings, revenue, profitability, valuation, and competitive position.",
             backstory=(
-                "You are an institutional fundamental research analyst. You evaluate company financial statements "
-                "and multiples (P/E, Forward P/E, PEG, P/S, EV/EBITDA) to determine valuation attractiveness and "
-                "operating strength. You rely strictly on the exact figures from your tools. Always include: "
-                "Growth Metrics (Revenue, EPS), Operating Margins, Return on Equity (ROE), Return on Assets (ROA), "
-                "Debt Ratio, Valuation multiples, and Competitive Analysis."
+                "Analyze only company financials, earnings, revenue, profitability, valuation, and competitive position. "
+                "Avoid complex jargon and keep the output beginner-friendly."
             ),
             verbose=True,
             allow_delegation=False,
@@ -172,27 +122,12 @@ class FinancialCrew:
 
     def _make_manager_agent(self):
         return Agent(
-            role="Chief Investment Officer — Final Validation Layer",
-            goal=(
-                "Aggregate all agent outputs. Check consistency between Risk Assessment and Technical Analysis. "
-                "Generate an Overall Market Outlook, Confidence Score, Key Risks, and Key Opportunities. "
-                "Ensure all statements are objective, professional, and evidence-based."
-            ),
+            role="Chief Investment Editor",
+            goal="Combine all agent reports into a single Master Investment Summary.",
             backstory=(
-                "You are the Chief Investment Officer at an institutional investment firm. "
-                "You STRICTLY rely on hard data and metrics delivered by your analysts. "
-                "Before issuing any recommendation, you MUST validate cross-agent consistency: "
-                "e.g., does a High Risk Level align with a Bullish Technical Trend? If not, you must explicitly acknowledge the divergence. "
-                "Your final report MUST include exactly these sections: "
-                "1. RECOMMENDATION (Buy / Hold / Sell) "
-                "2. EVIDENCE (list all supporting metrics and scores with exact values) "
-                "3. SUPPORTING INDICATORS (list all indicators that support the recommendation) "
-                "4. KEY RISKS (list concrete risks from the risk report) "
-                "5. KEY OPPORTUNITIES (list concrete opportunities from the technical report) "
-                "6. OVERALL MARKET OUTLOOK (professional, objective assessment) "
-                "7. CONFIDENCE SCORE (0–100) with reasoning. "
-                "Do NOT invent data. Do NOT give guaranteed profit claims. "
-                "Present uncertainty whenever data quality is limited."
+                "You are the Chief Investment Editor. Your job is to read all the agent reports and "
+                "combine them into a single, easy-to-read Master Investment Summary that reads like a "
+                "financial news article for beginners. Use simple English and short explanations."
             ),
             verbose=True,
             allow_delegation=True,
@@ -208,65 +143,20 @@ class FinancialCrew:
         """Run ONLY the News Analyst agent."""
         agent = self._make_news_agent()
         task = Task(
-            description=(
-                f"Use the news tool to fetch all news data for {ticker}. "
-                f"Then write a clear, beginner-friendly News Report following these strict rules:\n"
-                f"RULE 1: Focus ONLY on {ticker}. Use only articles from the tool's 'good_news', 'potential_concerns', and 'news_worth_watching' fields.\n"
-                f"RULE 2: For each article, the tool already tells you the Primary Beneficiary and Primary Risk Holder. "
-                f"An article is ONLY classified as 'Good News' if the Primary Beneficiary = Target Company. "
-                f"An article is ONLY classified as 'Potential Concerns' if the Primary Risk Holder = Target Company. "
-                f"If a competitor is the beneficiary, classify it under 'News Worth Watching' and explain why.\n"
-                f"RULE 3: Do NOT use jargon like 'bullish', 'bearish', 'equity', 'P/E ratio'. Write like a business news reporter talking to someone new to investing.\n"
-                f"RULE 4: For every news item, write 1-2 simple sentences explaining why it matters specifically for {ticker}.\n"
-                f"RULE 5: Copy the 'bottom_line' text exactly from the tool as your final Bottom Line section."
-            ),
+            description=f"Use the news tool to fetch all news data for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"A beginner-friendly News Sentiment Report for **{ticker}** in clean Markdown with exactly these sections:\n\n"
-                f"---\n"
-                f"## 📰 News Summary\n"
-                f"| What We Tracked | Numbers |\n"
-                f"| --- | --- |\n"
-                f"| ✅ Relevant News Articles | [relevant_articles_count from tool] |\n"
-                f"| 🚫 Articles Excluded | [excluded_articles_count from tool] |\n"
-                f"| 😊 Good News Stories | [bullish_count from tool] |\n"
-                f"| ⚠️ Concerning Stories | [bearish_count from tool] |\n"
-                f"| 📄 Neutral Updates | [neutral_count from tool] |\n\n"
-                f"---\n"
-                f"## 😊 Good News\n"
-                f"*Stories where {ticker} is the clear winner — where it directly benefits*\n\n"
-                f"For each item in good_news from the tool:\n"
-                f"**[Headline] ([Source])**\n"
-                f"> 🏢 **Who benefits**: [primary_beneficiary]  |  ⚠️ **Who is at risk**: [primary_risk_holder]\n"
-                f"> 💬 *Why it matters for you as an investor: [1-2 plain-English sentences explaining the direct impact on the company's business — revenue, sales, products, or customers]*\n\n"
-                f"---\n"
-                f"## ⚠️ Potential Concerns\n"
-                f"*Stories that raise questions or challenges specifically for {ticker}*\n\n"
-                f"For each item in potential_concerns from the tool:\n"
-                f"**[Headline] ([Source])**\n"
-                f"> 🏢 **Who benefits**: [primary_beneficiary]  |  ⚠️ **Who is at risk**: [primary_risk_holder]\n"
-                f"> 💬 *Why it matters: [1-2 plain-English sentences explaining the direct concern for the company's business]*\n\n"
-                f"---\n"
-                f"## 📄 News Worth Watching\n"
-                f"*Stories about the industry, competitors, or related topics — not directly about {ticker} but worth knowing*\n\n"
-                f"For each item in news_worth_watching from the tool:\n"
-                f"**[Headline] ([Source])**\n"
-                f"> 🏢 **Who benefits**: [primary_beneficiary]  |  ⚠️ **Who is at risk**: [primary_risk_holder]\n"
-                f"> 💬 *Note: [1-2 plain-English sentences — if a competitor benefits, say so clearly and explain why this is neutral or indirect for {ticker}]*\n\n"
-                f"---\n"
-                f"## 🛡️ How Confident Are We?\n"
-                f"- **Confidence Score**: [confidence_score from tool]% *(we never say 100% — markets are unpredictable)*\n"
-                f"- **Why**: [confidence_explanation from tool in plain English — simplify if needed]\n\n"
-                f"---\n"
-                f"## 📋 Bottom Line\n"
-                f"[Copy the exact 'bottom_line' text from the tool here — do not modify it]"
+                f"## News Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
         crew = Crew(agents=[agent], tasks=[task], process=Process.sequential)
-        
-        # Bypass Pydantic validation by assigning tools AFTER Crew instantiation
         agent.tools = [get_stock_news]
-        
         result = crew.kickoff(inputs={"ticker": ticker})
         self._log_agent_output("News Agent", str(result), ticker)
         return {"session_id": self.session_id, "agent": "news", "ticker": ticker, "result": str(result)}
@@ -276,23 +166,15 @@ class FinancialCrew:
         """Run ONLY the Technical Analyst agent."""
         agent = self._make_technical_agent()
         task = Task(
-            description=(
-                f"Use your tool to fetch all technical indicators for {ticker}. "
-                f"Validate, audit, and interpret each indicator. Detect any signal conflicts. "
-                f"Classify the trend and generate a Trend Strength Score and Signal Confidence Score."
-            ),
+            description=f"Use your tool to fetch technical indicators for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"An institutional-grade Technical Analysis Report for {ticker} formatted as clean Markdown (no raw JSON). "
-                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
-                f"1. PRICE & INDICATOR SUMMARY: Current Price, RSI(14) with interpretation, MACD Line/Signal/Histogram with interpretation, SMA20, SMA50, EMA12, EMA26, Bollinger Bands (Upper/Middle/Lower), ATR(14)\n"
-                f"2. VOLUME ANALYSIS: Current Volume, 20D Average Volume, Volume Ratio, Volume Trend\n"
-                f"3. SUPPORT & RESISTANCE: Pivot Point, R1, R2, S1, S2, 52W High, 52W Low\n"
-                f"4. MOMENTUM ANALYSIS: Price vs SMA20, Price vs SMA50, Bollinger Band position\n"
-                f"5. SIGNAL CONFLICTS: List all detected conflicts with professional explanations\n"
-                f"6. TREND CLASSIFICATION: Strong Bullish / Bullish / Neutral / Bearish / Strong Bearish + Trend Score (0-100)\n"
-                f"7. SIGNAL CONFIDENCE SCORE (0-100) with warning if below 70\n"
-                f"8. DATA FLAGS: List all quality flags\n"
-                f"9. METHODOLOGY: Data Source, Analysis Timestamp"
+                f"## Technical Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -307,23 +189,15 @@ class FinancialCrew:
         """Run ONLY the Risk Officer agent."""
         agent = self._make_risk_agent()
         task = Task(
-            description=(
-                f"Use your tool to fetch all risk metrics for {ticker}. "
-                f"Validate the calculations. Generate a Risk Score and Risk Level. "
-                f"Use compliant VaR language. Flag any unreliable data. "
-                f"Include the complete Methodology section."
-            ),
+            description=f"Use your tool to fetch risk metrics for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"An institutional-grade Risk Assessment Report for {ticker} formatted as clean Markdown (no raw JSON). "
-                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
-                f"1. RISK METRICS TABLE: Annualized Volatility, Beta, Alpha (Annualized), Max Drawdown, Sharpe Ratio, Sortino Ratio, Downside Deviation, Benchmark Correlation\n"
-                f"2. VALUE AT RISK: VaR (95%, 1-Day) with COMPLIANT interpretation: 'Based on historical return distributions, 95% of observed returns were better than X%, while 5% were worse. Actual future losses may exceed this estimate.'\n"
-                f"3. CVAR / EXPECTED SHORTFALL: CVaR (95%) value\n"
-                f"4. RISK SCORE: Numeric score 0–100\n"
-                f"5. RISK LEVEL: Low / Moderate / High / Very High\n"
-                f"6. CONFIDENCE SCORE: 0–100 — display 'LOW CONFIDENCE WARNING' if below 70\n"
-                f"7. DATA FLAGS: List all flags (INSUFFICIENT_DATA, MISSING_BENCHMARK, EXTREME_BETA_OUTLIER, etc.)\n"
-                f"8. METHODOLOGY: Data Source, Analysis Period, Benchmark Used, Risk-Free Rate, VaR Confidence Level, VaR Time Horizon, Trading Days Analyzed"
+                f"## Risk Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -338,15 +212,15 @@ class FinancialCrew:
         """Run ONLY the Fundamental Analyst agent."""
         agent = self._make_fundamental_agent()
         task = Task(
-            description=f"Use your tool to fetch all fundamental and financial data for {ticker}. Assess valuation and health.",
+            description=f"Use your tool to fetch fundamental data for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"An institutional-grade Fundamental Analysis Report for {ticker} formatted as clean Markdown (no raw JSON). "
-                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
-                f"1. FINANCIAL METRICS: Revenue Growth, EPS Growth, Operating Margin, Free Cash Flow, Debt Ratio, ROE, ROA\n"
-                f"2. VALUATION SUMMARY: P/E, Forward P/E, PEG, Price/Sales, EV/EBITDA\n"
-                f"3. COMPETITIVE ANALYSIS: Market Position, Moat, Competitor Comparison\n"
-                f"4. SCORES: Fundamental Score, Valuation Score, Financial Health Score (all 0-100)\n"
-                f"5. VIEWS: Short-Term View, Long-Term View"
+                f"## Fundamental Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -362,29 +236,20 @@ class FinancialCrew:
         agent = self._make_portfolio_agent()
         p_id = portfolio_id or "default_portfolio"
         task = Task(
-            description=(
-                "Use your tool to retrieve holdings for the active portfolio and evaluate them. "
-                "Assess diversification quality, sector exposure, and allocation balance. "
-                "Provide concrete rebalancing suggestions and highlight concentration risks."
-            ),
+            description="Use your tool to retrieve holdings for the active portfolio. Write a concise, beginner-friendly report.",
             expected_output=(
-                "A detailed portfolio review report formatted as clean Markdown (no raw JSON). "
-                "Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST contain:\n"
-                "1. PORTFOLIO VALUE: total value of the active portfolio\n"
-                "2. DIVERSIFICATION SCORE: 0-10 score with explanation\n"
-                "3. SECTOR EXPOSURE: percentage of allocation by sector\n"
-                "4. CONCENTRATION RISK: assessment of high-weight positions\n"
-                "5. CORRELATION ANALYSIS: correlation between holdings\n"
-                "6. REBALANCING SUGGESTIONS: concrete changes to improve diversification\n"
-                "7. PORTFOLIO RISK SCORE: 0-100 score"
+                "## Portfolio Report\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
         crew = Crew(agents=[agent], tasks=[task], process=Process.sequential)
-        
-        # Bypass Pydantic validation by assigning tools AFTER Crew instantiation
         agent.tools = [get_portfolio_data]
-        
         result = crew.kickoff(inputs={"portfolio_id": p_id})
         self._log_agent_output("Portfolio Agent", str(result), p_id)
         return {"session_id": self.session_id, "agent": "portfolio", "portfolio_id": p_id, "result": str(result)}
@@ -404,132 +269,71 @@ class FinancialCrew:
         manager_agent = self._make_manager_agent()
 
         news_task = Task(
-            description=(
-                f"Use the news tool to fetch all news data for {ticker}. "
-                f"Then write a clear, beginner-friendly News Report following these strict rules:\n"
-                f"RULE 1: Focus ONLY on {ticker}. Use only articles from the tool's 'good_news', 'potential_concerns', and 'news_worth_watching' fields.\n"
-                f"RULE 2: For each article, the tool already tells you the Primary Beneficiary and Primary Risk Holder. "
-                f"An article is ONLY classified as 'Good News' if the Primary Beneficiary = Target Company. "
-                f"An article is ONLY classified as 'Potential Concerns' if the Primary Risk Holder = Target Company. "
-                f"If a competitor is the beneficiary, classify it under 'News Worth Watching' and explain why.\n"
-                f"RULE 3: Do NOT use jargon like 'bullish', 'bearish', 'equity', 'P/E ratio'. Write like a business news reporter talking to someone new to investing.\n"
-                f"RULE 4: For every news item, write 1-2 simple sentences explaining why it matters specifically for {ticker}.\n"
-                f"RULE 5: Copy the 'bottom_line' text exactly from the tool as your final Bottom Line section."
-            ),
+            description=f"Use the news tool to fetch all news data for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"A beginner-friendly News Sentiment Report for **{company} ({ticker})** in clean Markdown with exactly these sections:\n\n"
-                f"---\n"
-                f"## 📰 News Summary\n"
-                f"| What We Tracked | Numbers |\n"
-                f"| --- | --- |\n"
-                f"| ✅ Relevant News Articles | [relevant_articles_count from tool] |\n"
-                f"| 🚫 Articles Excluded | [excluded_articles_count from tool] |\n"
-                f"| 😊 Good News Stories | [bullish_count from tool] |\n"
-                f"| ⚠️ Concerning Stories | [bearish_count from tool] |\n"
-                f"| 📄 Neutral Updates | [neutral_count from tool] |\n\n"
-                f"---\n"
-                f"## 😊 Good News\n"
-                f"*Stories where {company} is the clear winner — where it directly benefits*\n\n"
-                f"For each item in good_news from the tool:\n"
-                f"**[Headline] ([Source])**\n"
-                f"> 🏢 **Who benefits**: [primary_beneficiary]  |  ⚠️ **Who is at risk**: [primary_risk_holder]\n"
-                f"> 💬 *Why it matters for you as an investor: [1-2 plain-English sentences explaining the direct impact on the company's business — revenue, sales, products, or customers]*\n\n"
-                f"---\n"
-                f"## ⚠️ Potential Concerns\n"
-                f"*Stories that raise questions or challenges specifically for {company}*\n\n"
-                f"For each item in potential_concerns from the tool:\n"
-                f"**[Headline] ([Source])**\n"
-                f"> 🏢 **Who benefits**: [primary_beneficiary]  |  ⚠️ **Who is at risk**: [primary_risk_holder]\n"
-                f"> 💬 *Why it matters: [1-2 plain-English sentences explaining the direct concern for the company's business]*\n\n"
-                f"---\n"
-                f"## 📄 News Worth Watching\n"
-                f"*Stories about the industry, competitors, or related topics — not directly about {company} but worth knowing*\n\n"
-                f"For each item in news_worth_watching from the tool:\n"
-                f"**[Headline] ([Source])**\n"
-                f"> 🏢 **Who benefits**: [primary_beneficiary]  |  ⚠️ **Who is at risk**: [primary_risk_holder]\n"
-                f"> 💬 *Note: [1-2 plain-English sentences — if a competitor benefits, say so clearly and explain why this is neutral or indirect for {company}]*\n\n"
-                f"---\n"
-                f"## 🛡️ How Confident Are We?\n"
-                f"- **Confidence Score**: [confidence_score from tool]% *(we never say 100% — markets are unpredictable)*\n"
-                f"- **Why**: [confidence_explanation from tool in plain English — simplify if needed]\n\n"
-                f"---\n"
-                f"## 📋 Bottom Line\n"
-                f"[Copy the exact 'bottom_line' text from the tool here — do not modify it]"
+                f"## News Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=news_agent,
             async_execution=True,
         )
         tech_task = Task(
-            description=(
-                f"Use your tool to fetch all technical indicators for {ticker}. "
-                f"Validate, audit, and interpret each indicator. Detect any signal conflicts. "
-                f"Classify the trend and generate a Trend Strength Score and Signal Confidence Score."
-            ),
+            description=f"Use your tool to fetch technical indicators for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"An institutional-grade Technical Analysis Report for {company} ({ticker}) formatted as clean Markdown (no raw JSON). "
-                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
-                f"1. PRICE & INDICATOR SUMMARY: Current Price, RSI(14) with interpretation, MACD Line/Signal/Histogram with interpretation, SMA20, SMA50, EMA12, EMA26, Bollinger Bands, ATR(14)\n"
-                f"2. VOLUME ANALYSIS: Current Volume, 20D Average Volume, Volume Ratio, Volume Trend\n"
-                f"3. SUPPORT & RESISTANCE: Pivot Point, R1, R2, S1, S2, 52W High, 52W Low\n"
-                f"4. MOMENTUM ANALYSIS: Price vs SMA20/SMA50, Bollinger Band position\n"
-                f"5. SIGNAL CONFLICTS: All detected conflicts with professional explanations\n"
-                f"6. TREND CLASSIFICATION: Label + Trend Score (0-100)\n"
-                f"7. SIGNAL CONFIDENCE SCORE (0-100) with warning if below 70\n"
-                f"8. DATA FLAGS and METHODOLOGY"
+                f"## Technical Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=tech_agent,
             async_execution=True,
         )
         risk_task = Task(
-            description=(
-                f"Use your tool to fetch all risk metrics for {ticker}. "
-                f"Validate the calculations. Enforce compliant VaR language. "
-                f"Include the complete Methodology section."
-            ),
+            description=f"Use your tool to fetch risk metrics for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"An institutional-grade Risk Assessment Report for {company} ({ticker}) formatted as clean Markdown (no raw JSON). "
-                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
-                f"1. RISK METRICS TABLE: Volatility, Beta, Alpha, Max Drawdown, Sharpe, Sortino, Downside Deviation, Correlation\n"
-                f"2. VALUE AT RISK (compliant): 'Based on historical return distributions, 95% of observed returns were better than X%, while 5% were worse. Actual future losses may exceed this estimate.'\n"
-                f"3. CVAR / EXPECTED SHORTFALL\n"
-                f"4. RISK SCORE (0-100), RISK LEVEL (Low/Moderate/High/Very High)\n"
-                f"5. CONFIDENCE SCORE with LOW CONFIDENCE WARNING if below 70\n"
-                f"6. DATA FLAGS and METHODOLOGY section"
+                f"## Risk Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=risk_agent,
             context=[news_task, tech_task],
         )
         fund_task = Task(
-            description=f"Use your tool to fetch all fundamental and financial data for {ticker}. Assess valuation metrics and operational growth.",
+            description=f"Use your tool to fetch fundamental data for {ticker}. Write a concise, beginner-friendly report.",
             expected_output=(
-                f"An institutional-grade Fundamental Analysis Report for {company} ({ticker}) formatted as clean Markdown (no raw JSON). "
-                f"Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST include:\n"
-                f"1. FINANCIAL METRICS: Revenue Growth, EPS Growth, Operating Margin, Free Cash Flow, Debt Ratio, ROE, ROA\n"
-                f"2. VALUATION SUMMARY: P/E, Forward P/E, PEG, Price/Sales, EV/EBITDA\n"
-                f"3. COMPETITIVE ANALYSIS: Market Position, Moat, Competitor Comparison\n"
-                f"4. SCORES: Fundamental Score, Valuation Score, Financial Health Score\n"
-                f"5. VIEWS: Short-Term View, Long-Term View"
+                f"## Fundamental Report for {ticker}\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=fund_agent,
             async_execution=True,
         )
         port_task = Task(
-            description=(
-                "Use your tool to retrieve holdings for the active portfolio and evaluate them. "
-                "Assess diversification quality, sector exposure, and allocation balance. "
-                "Highlight concentration risks and suggest rebalancing."
-            ),
+            description="Use your tool to retrieve holdings for the active portfolio. Write a concise, beginner-friendly report.",
             expected_output=(
-                "A detailed portfolio review report formatted as clean Markdown (no raw JSON). "
-                "Format the sections using headings (##), bullet lists, and tables where appropriate. It MUST contain:\n"
-                "1. PORTFOLIO VALUE: total value of the active portfolio\n"
-                "2. DIVERSIFICATION SCORE: 0-10 score with explanation\n"
-                "3. SECTOR EXPOSURE: percentage of allocation by sector\n"
-                "4. CONCENTRATION RISK: assessment of high-weight positions\n"
-                "5. CORRELATION ANALYSIS: correlation between holdings\n"
-                "6. REBALANCING SUGGESTIONS: concrete changes to improve diversification\n"
-                "7. PORTFOLIO RISK SCORE: 0-100 score\n"
-                "If no portfolio exists, output 'No portfolio available for analysis.' without throwing errors."
+                "## Portfolio Report\n"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=port_agent,
             async_execution=True,
@@ -537,22 +341,23 @@ class FinancialCrew:
         manager_task = Task(
             description=(
                 f"Review the sentiment, technical, risk, fundamental, and portfolio reports for {company}. "
-                f"Generate a balanced, institutional-grade master investment summary. "
-                f"Never provide direct buy/sell advice; use institutional-style research reporting."
+                f"Generate a balanced, beginner-friendly master investment summary."
             ),
             expected_output=(
-                f"An institutional-grade Master Investment Report for {company} ({ticker}) with exactly these sections:\n"
-                f"1. MASTER INVESTMENT SUMMARY: A high-level consolidated report overview\n"
-                f"2. SENTIMENT SUMMARY: Detailed summary of news drivers, sources, and reliability tiers\n"
-                f"3. TECHNICAL SUMMARY: Detailed summary of multi-timeframe trends, conflicts, risk traps, and setups\n"
-                f"4. RISK SUMMARY: Detailed summary of risk attribution, stress tests, and scenario simulations\n"
-                f"5. FUNDAMENTAL SUMMARY: Detailed summary of margins, health scores, valuation, and competitor comparisons\n"
-                f"6. PORTFOLIO SUMMARY: Detailed summary of current portfolio health and rebalancing recommendations\n"
-                f"7. OVERALL CONVICTION SCORE (0-100) with reasoning\n"
-                f"8. OVERALL CONFIDENCE SCORE (0-100) with explanation\n"
-                f"9. BULL CASE: Supporting factors for an upward trajectory\n"
-                f"10. BEAR CASE: Impeding factors or downside catalysts\n"
-                f"11. NEUTRAL CASE: Consolidating factors"
+                f"# Master Investment Summary for {company} ({ticker})\n\n"
+                f"## 📰 News Summary\n"
+                f"[Simple explanation derived from News Agent]\n\n"
+                f"## 📈 Technical Summary\n"
+                f"[Simple explanation derived from Technical Agent]\n\n"
+                f"## 🛡️ Risk Summary\n"
+                f"[Simple explanation derived from Risk Agent]\n\n"
+                f"## 🏢 Fundamental Summary\n"
+                f"[Simple explanation derived from Fundamental Agent]\n\n"
+                f"## 💼 Portfolio Summary\n"
+                f"[Simple explanation derived from Portfolio Agent]\n\n"
+                f"---\n\n"
+                f"## 🎯 Overall Investment Outlook\n"
+                f"[A highly readable, beginner-friendly final verdict combining all factors]"
             ),
             agent=manager_agent,
             context=[news_task, tech_task, risk_task, fund_task, port_task],
@@ -585,9 +390,9 @@ class FinancialCrew:
 
         # Parse recommendation roughly
         res_str = str(result).upper()
-        if "CONVICTION: HIGH" in res_str or "BULLISH" in res_str:
+        if "BUY" in res_str or "BULLISH" in res_str:
             rec = "BUY"
-        elif "BEARISH" in res_str:
+        elif "SELL" in res_str or "BEARISH" in res_str:
             rec = "SELL"
         else:
             rec = "HOLD"

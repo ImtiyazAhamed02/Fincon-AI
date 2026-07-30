@@ -9,7 +9,7 @@ import { PieChart as RPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from '
 import Markdown from '../components/Markdown';
 import { useTheme } from '../context/ThemeContext';
 
-const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 const COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#38bdf8', '#a855f7', '#14b8a6'];
 

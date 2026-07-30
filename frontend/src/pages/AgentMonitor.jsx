@@ -9,14 +9,14 @@ import {
 import { GEMINI_MODEL } from '../config/gemini';
 import { useTheme } from '../context/ThemeContext';
 
-const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 const AGENT_COLOR_MAP = {
   'News Agent': 'var(--accent-blue)',
-  'Technical Agent': 'var(--accent-purple)',
-  'Risk Agent': 'var(--accent-amber)',
-  'Fundamental Agent': 'var(--accent-rose)',
-  'Portfolio Agent': 'var(--accent-emerald)',
+  'Technical Agent': 'var(--accent-blue)',
+  'Risk Agent': 'var(--accent-blue)',
+  'Fundamental Agent': 'var(--accent-blue)',
+  'Portfolio Agent': 'var(--accent-blue)',
   'Manager Agent': 'var(--accent-blue)',
 };
 
@@ -96,7 +96,10 @@ const AGENTS = [
 ];
 
 function AgentStatusCard({ agent }) {
-  const { icon: Icon, label, fullLabel, description, color, rawColor, capability, model, tools } = agent;
+  const { icon: Icon, label, fullLabel, description, capability, model, tools } = agent;
+  const { isDark } = useTheme();
+  const color = 'var(--accent-blue)';
+  const rawColor = isDark ? '#6366f1' : '#4f46e5';
 
   return (
     <div
@@ -157,14 +160,14 @@ function AgentStatusCard({ agent }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs pt-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
           <div>
-            <p className="mb-0.5" style={{ color: 'var(--text-muted)' }}>Model</p>
+            <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: 'var(--text-muted)' }}>Model</p>
             <p className="font-mono font-semibold" style={{ color: 'var(--text-secondary)' }}>{model}</p>
           </div>
-          <div className="text-right">
-            <p className="mb-0.5" style={{ color: 'var(--text-muted)' }}>Tools</p>
-            <p className="font-mono" style={{ color: 'var(--text-secondary)' }}>{tools[0]}</p>
+          <div className="sm:text-right">
+            <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: 'var(--text-muted)' }}>Tools</p>
+            <p className="font-mono break-all" style={{ color: 'var(--text-secondary)' }}>{tools[0]}</p>
           </div>
         </div>
       </div>

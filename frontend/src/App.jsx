@@ -16,7 +16,6 @@ const NAV = [
   { to: '/',         icon: LayoutDashboard, label: 'Dashboard',       end: true },
   { to: '/analysis', icon: TrendingUp,      label: 'Stock Analysis'          },
   { to: '/portfolio',icon: PieChart,        label: 'Portfolio'               },
-  { to: '/agents',   icon: Bot,             label: 'Agent Monitor'           },
   { to: '/history',  icon: Clock,           label: 'History'                 },
 ];
 
@@ -37,42 +36,30 @@ function Sidebar({ isOpen, onClose }) {
       )}
 
       <aside className={`
-        w-[260px] flex-shrink-0 flex flex-col h-screen
+        w-[260px] flex flex-col h-screen
         fixed inset-y-0 left-0 z-50
         transform transition-transform duration-200 ease-in-out
-        md:relative md:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}
         style={{
-          background: isDark
-            ? 'linear-gradient(180deg, #080c1a 0%, #0a0f20 100%)'
-            : 'linear-gradient(180deg, #ffffff 0%, #f8f9fc 100%)',
-          borderRight: `1px solid var(--border-subtle)`,
+          background: '#000000',
+          borderRight: `1px solid #171717`,
         }}
       >
         {/* Logo */}
         <div className="px-6 pt-6 pb-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center relative"
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center relative"
               style={{
                 background: 'var(--gradient-primary)',
-                boxShadow: '0 4px 20px rgba(79, 139, 255, 0.35)',
               }}>
               <Activity className="w-5 h-5 text-white" />
-              {/* Glow ring */}
-              <div className="absolute inset-0 rounded-2xl animate-pulse-glow"
-                style={{
-                  background: 'var(--gradient-primary)',
-                  opacity: 0.3,
-                  filter: 'blur(8px)',
-                }}
-              />
             </div>
             <div>
-              <span className="text-lg font-black tracking-tight gradient-text">FINCON</span>
+              <span className="text-lg font-black tracking-tight text-white">FINCON</span>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="status-dot status-dot-online" style={{ width: 6, height: 6 }} />
-                <span className="text-[10px] font-medium" style={{ color: 'var(--text-tertiary)' }}>AI Platform</span>
+                <span className="status-dot status-dot-online" style={{ width: 6, height: 6, background: '#ffffff' }} />
+                <span className="text-[10px] font-bold uppercase" style={{ color: '#888888' }}>AI Platform</span>
               </div>
             </div>
           </div>
@@ -94,27 +81,23 @@ function Sidebar({ isOpen, onClose }) {
             {NAV.map(({ to, icon: Icon, label, end }) => (
               <NavLink key={to} to={to} end={end} onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group relative ${
-                    isActive ? '' : ''
-                  }`
+                  `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-bold transition-all duration-150 group relative`
                 }
                 style={({ isActive }) => ({
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                  background: isActive
-                    ? (isDark ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.08)')
-                    : 'transparent',
-                  borderLeft: isActive ? '3px solid var(--accent-emerald)' : '3px solid transparent',
+                  color: isActive ? '#ffffff' : '#888888',
+                  background: isActive ? '#121212' : 'transparent',
+                  borderLeft: isActive ? '3px solid #6366f1' : '3px solid transparent',
                 })}
               >
                 {({ isActive }) => (
                   <>
                     <Icon style={{
                       width: 18, height: 18,
-                      color: isActive ? 'var(--accent-emerald)' : 'var(--text-muted)',
+                      color: isActive ? '#6366f1' : '#555555',
                       transition: 'color 0.15s',
                     }} />
                     <span className="flex-1">{label}</span>
-                    {isActive && <ChevronRight className="w-3.5 h-3.5" style={{ color: 'var(--accent-emerald)', opacity: 0.6 }} />}
+                    {isActive && <ChevronRight className="w-3.5 h-3.5" style={{ color: '#6366f1', opacity: 0.8 }} />}
                   </>
                 )}
               </NavLink>
@@ -123,26 +106,26 @@ function Sidebar({ isOpen, onClose }) {
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <div className="p-4" style={{ borderTop: '1px solid #171717' }}>
           {/* System Status */}
-          <div className="card rounded-xl p-3 mb-3 hidden sm:block">
+          <div className="card rounded-lg p-3 mb-3 hidden sm:block" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
             <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5"
-              style={{ color: 'var(--text-muted)' }}>
+              style={{ color: '#555555' }}>
               System Status
             </p>
             <div className="space-y-2">
               {[
-                { label: 'AI Engine', status: 'Online', icon: Zap, color: 'var(--accent-emerald)' },
-                { label: 'Risk Shield', status: 'Active', icon: Shield, color: 'var(--accent-blue)' },
+                { label: 'AI Engine', status: 'Online', icon: Zap, color: '#ffffff' },
+                { label: 'Risk Shield', status: 'Active', icon: Shield, color: '#ffffff' },
               ].map(({ label, status, icon: SIcon, color }) => (
                 <div key={label} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <SIcon className="w-3.5 h-3.5" style={{ color }} />
-                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{label}</span>
+                    <SIcon className="w-3.5 h-3.5" style={{ color: '#6366f1' }} />
+                    <span className="text-xs" style={{ color: '#888888' }}>{label}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="status-dot status-dot-online" style={{ width: 5, height: 5 }} />
-                    <span className="text-[10px] font-medium" style={{ color }}>{status}</span>
+                    <span className="status-dot" style={{ width: 5, height: 5, background: '#ffffff' }} />
+                    <span className="text-[10px] font-bold uppercase" style={{ color }}>{status}</span>
                   </div>
                 </div>
               ))}
@@ -151,13 +134,13 @@ function Sidebar({ isOpen, onClose }) {
 
           {/* User */}
           <div className="flex items-center gap-3 px-2">
-            <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
-              style={{ background: 'var(--gradient-primary)' }}>
+            <div className="w-8 h-8 rounded-md flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
+              style={{ background: '#6366f1' }}>
               FU
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>FINCON User</p>
-              <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>Pro Plan</p>
+              <p className="text-xs font-bold truncate" style={{ color: '#ffffff' }}>FINCON User</p>
+              <p className="text-[10px] truncate" style={{ color: '#555555' }}>Pro Plan</p>
             </div>
           </div>
         </div>
@@ -175,9 +158,7 @@ function TopBar({ title, subtitle, onMenuClick }) {
   return (
     <header className="px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-20"
       style={{
-        background: isDark
-          ? 'rgba(8, 12, 26, 0.85)'
-          : 'rgba(255, 255, 255, 0.85)',
+        background: 'var(--bg-header)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '1px solid var(--border-subtle)',
@@ -247,9 +228,8 @@ function TopBar({ title, subtitle, onMenuClick }) {
 // ─────────────────────────────────────────────────────────────────────────────
 const PAGE_META = {
   '/':          { title: 'Dashboard',      subtitle: 'Your AI-powered financial command center' },
-  '/analysis':  { title: 'Stock Analysis', subtitle: 'Run individual or full multi-agent analysis' },
+  '/analysis':  { title: 'Stock Analysis', subtitle: 'Run individual or coordinated analysis modules' },
   '/portfolio': { title: 'Portfolio',      subtitle: 'Manage and optimize your investments' },
-  '/agents':    { title: 'Agent Monitor',  subtitle: 'Real-time agent status and execution logs' },
   '/history':   { title: 'History',        subtitle: 'Browse past analysis sessions' },
 };
 
@@ -263,16 +243,21 @@ function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
+    <div className="flex h-screen overflow-hidden w-full" style={{ background: 'var(--bg-base)' }}>
+      {/* Drawer Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      
+      {/* Desktop layout spacing */}
+      <div className="hidden md:block w-[260px] flex-shrink-0" />
+
+      {/* Main viewport */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 w-full">
         <TopBar title={meta.title} subtitle={meta.subtitle} onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto">
           <Routes>
             <Route path="/"         element={<Dashboard />} />
             <Route path="/analysis" element={<StockAnalysis />} />
             <Route path="/portfolio"element={<Portfolio />} />
-            <Route path="/agents"   element={<AgentMonitor />} />
             <Route path="/history"  element={<History />} />
           </Routes>
         </main>

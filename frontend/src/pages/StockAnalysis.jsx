@@ -8,7 +8,7 @@ import {
 import Markdown from '../components/Markdown';
 import { useTheme } from '../context/ThemeContext';
 
-const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Agent definitions
@@ -65,7 +65,9 @@ const AGENTS = [
 // Agent Card Component
 // ─────────────────────────────────────────────────────────────────────────────
 function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
-  const { icon: Icon, label, description, color } = agent;
+  const { icon: Icon, label, description } = agent;
+  const { isDark } = useTheme();
+  const color = isDark ? '#6366f1' : '#4f46e5';
   const { loading, result, error } = state;
   const [expanded, setExpanded] = useState(false);
 
@@ -244,9 +246,9 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
             <Users className="w-6 h-6" style={{ color: 'var(--accent-blue)' }} />
           </div>
           <div>
-            <p className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>Full Multi-Agent Crew</p>
+            <p className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>Full Research Pipeline</p>
             <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
-              News → Technical → Risk → Fundamental → Portfolio → CIO recommendation
+              News Sentiment → Technical Indicators → Risk Assessment → Fundamental Valuation → Portfolio Allocation
             </p>
           </div>
         </div>
@@ -262,7 +264,7 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
             className="btn-primary flex items-center space-x-2 disabled:opacity-30 whitespace-nowrap"
           >
             {loading
-              ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Running Full Crew…</span></>
+              ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Running Pipeline…</span></>
               : <><Zap className="w-4 h-4" /><span>Run Full Analysis</span></>
             }
           </button>
@@ -272,30 +274,30 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
       <div className="px-6 py-5">
         {!result && !error && !loading && (
           <p className="text-sm italic text-center py-4" style={{ color: 'var(--text-muted)' }}>
-            Enter a ticker above and run the full crew to get a comprehensive investment recommendation from all agents.
+            Enter a ticker above and launch the full pipeline to run coordinated analysis across all valuation modules.
           </p>
         )}
         {loading && (
           <div className="flex flex-col items-center py-8 space-y-5">
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {[
-                { icon: Newspaper,  color: '#3b82f6', d: '0ms'   },
-                { icon: TrendingUp, color: '#8b5cf6', d: '150ms' },
-                { icon: ShieldAlert,color: '#f59e0b', d: '300ms' },
-                { icon: BookOpen,   color: '#ec4899', d: '450ms' },
-                { icon: Briefcase,  color: '#10b981', d: '600ms' },
-                { icon: Users,      color: '#60a5fa', d: '750ms' },
-              ].map(({ icon: AgIcon, color: c, d }, i) => (
+                { icon: Newspaper,  d: '0ms'   },
+                { icon: TrendingUp, d: '150ms' },
+                { icon: ShieldAlert, d: '300ms' },
+                { icon: BookOpen,   d: '450ms' },
+                { icon: Briefcase,  d: '600ms' },
+                { icon: Users,      d: '750ms' },
+              ].map(({ icon: AgIcon, d }, i) => (
                 <div key={i} className="flex flex-col items-center space-y-2">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center animate-pulse"
-                    style={{ background: `${c}12`, border: `1px solid ${c}25`, animationDelay: d }}>
-                    <AgIcon className="w-4.5 h-4.5 sm:w-5 sm:h-5" style={{ color: c }} />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center animate-pulse"
+                    style={{ background: `${themeIndigo}12`, border: `1px solid ${themeIndigo}25`, animationDelay: d }}>
+                    <AgIcon className="w-4.5 h-4.5 sm:w-5 sm:h-5" style={{ color: themeIndigo }} />
                   </div>
                 </div>
               ))}
             </div>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              All 6 agents are deliberating… this may take 60–120s
+              All analysis modules are running… this may take 60–120s
             </p>
             <div className="flex space-x-1.5">
               {[0,1,2,3,4].map(i => (
@@ -351,6 +353,7 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function StockAnalysis() {
   const { isDark } = useTheme();
+  const themeIndigo = isDark ? '#6366f1' : '#4f46e5';
   const [ticker, setTicker] = useState('');
   const [companyName, setCompanyName] = useState('');
 
@@ -389,10 +392,10 @@ export default function StockAnalysis() {
       {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-          Stock <span className="gradient-text">Analysis</span>
+          Research &amp; <span className="gradient-text">Analysis</span>
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>
-          Run AI-powered agents individually or as a coordinated crew for comprehensive insights.
+          Run specific analysis modules individually or coordinate them through the full research pipeline.
         </p>
       </div>
 
@@ -435,7 +438,7 @@ export default function StockAnalysis() {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5">
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            Run agents individually or launch the full crew at once
+            Run analysis modules individually or launch the full pipeline
           </p>
           <button
             onClick={runAll}
@@ -443,14 +446,14 @@ export default function StockAnalysis() {
             className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto"
           >
             <Activity className="w-4 h-4" />
-            <span>Run All Agents</span>
+            <span>Run All Modules</span>
           </button>
         </div>
       </div>
 
-      {/* ── Individual Agents ───────────────────────────────────────────────── */}
+      {/* ── Individual Modules ───────────────────────────────────────────────── */}
       <div>
-        <h3 className="label mb-4">Individual Agents</h3>
+        <h3 className="label mb-4">Analysis Modules</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {AGENTS.map(agent => (
             <AgentCard
@@ -465,9 +468,9 @@ export default function StockAnalysis() {
         </div>
       </div>
 
-      {/* ── Full Crew ───────────────────────────────────────────────────────── */}
+      {/* ── Full Research Pipeline ────────────────────────────────────────────── */}
       <div>
-        <h3 className="label mb-4">Full Multi-Agent Crew</h3>
+        <h3 className="label mb-4">Full Research Pipeline</h3>
         <FullCrewCard
           state={states.full}
           ticker={ticker}

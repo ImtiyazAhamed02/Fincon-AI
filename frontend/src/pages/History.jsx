@@ -9,7 +9,7 @@ import {
 import Markdown from '../components/Markdown';
 import { useTheme } from '../context/ThemeContext';
 
-const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 const REC_CONFIG = {
   BUY:  { badge: 'badge-green',  icon: TrendingUp,   label: 'BUY'  },
@@ -189,7 +189,7 @@ export default function History() {
                         </span>
                         <span className="flex items-center space-x-1 text-[10px]" style={{ color: 'var(--text-muted)' }}>
                           <Bot className="w-3 h-3" />
-                          <span>{s.agents.length} agents</span>
+                          <span>{s.agents.length} modules</span>
                         </span>
                         <span className="flex items-center space-x-1 text-[10px]" style={{ color: 'var(--text-muted)' }}>
                           <Clock className="w-3 h-3" />
@@ -236,7 +236,7 @@ export default function History() {
                   </div>
                 </div>
 
-                {/* Agents row */}
+                {/* Modules row */}
                 <div
                   className="flex items-center space-x-2 mt-3 pt-3 flex-wrap gap-y-1"
                   style={{ borderTop: '1px solid var(--border-subtle)' }}
@@ -245,7 +245,7 @@ export default function History() {
                     className="text-[10px] uppercase tracking-widest font-semibold"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    Agents:
+                    Modules:
                   </span>
                   {s.agents.map(a => (
                     <span
@@ -339,8 +339,8 @@ export default function History() {
                       accent: 'var(--accent-blue)',
                     },
                     {
-                      label: 'Agents Used',
-                      value: selected.agents.length,
+                      label: 'Analysis Scope',
+                      value: `${selected.agents.length} Modules`,
                       accent: 'var(--accent-purple)',
                     },
                   ].map(item => (
@@ -377,9 +377,9 @@ export default function History() {
                   </div>
                 </div>
 
-                {/* Agents involved */}
+                {/* Modules involved */}
                 <div>
-                  <p className="label text-[10px] mb-2">Agents Involved</p>
+                  <p className="label text-[10px] mb-2">Modules Involved</p>
                   <div className="flex flex-wrap gap-1.5">
                     {selected.agents.map(a => (
                       <span key={a} className="badge-blue text-[10px]">{a}</span>

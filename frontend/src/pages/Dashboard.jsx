@@ -24,7 +24,7 @@ const MARKET_INDICES = [
   { name: 'VIX',        value: '13.24',    change: '-5.42%', up: false, data: sparkData(13, 2) },
 ];
 
-const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 
 // Custom tooltip for recharts
@@ -250,8 +250,8 @@ export default function Dashboard() {
       {/* ── Stats Row ────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Analyses Today"   value={stats.analyses_today}   sub="Based on history logs"     icon={BarChart2}  color="var(--accent-blue)" />
-        <StatCard label="Active Agents"    value="6"    sub="All systems online"     icon={Bot}        color="var(--accent-emerald)" />
-        <StatCard label="Avg Confidence"   value={`${stats.avg_confidence}%`}  sub="Across all sessions"   icon={Activity}   color="var(--accent-purple)" />
+        <StatCard label="System Health"    value="100%"    sub="All services online"     icon={Activity}        color="var(--accent-emerald)" />
+        <StatCard label="Avg Confidence"   value={`${stats.avg_confidence}%`}  sub="Across all sessions"   icon={TrendingUp}   color="var(--accent-purple)" />
         <StatCard label="Total Sessions" value={stats.sessions_this_week}  sub="Stored in SQLite"    icon={Clock}      color="var(--accent-amber)" />
       </div>
 
@@ -382,18 +382,18 @@ export default function Dashboard() {
             style={{ borderBottom: '1px solid var(--border-subtle)' }}
           >
             <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-              Agent Activity
+              Analysis Modules
             </h3>
           </div>
           <div className="px-6 py-6 space-y-4">
-            {/* Agent status indicators */}
+            {/* Module status indicators */}
             {[
-              { name: 'News Agent', icon: Newspaper, color: 'var(--accent-blue)', raw: '#4f8bff' },
-              { name: 'Technical Agent', icon: TrendingUp, color: 'var(--accent-purple)', raw: '#a78bfa' },
-              { name: 'Risk Agent', icon: ShieldAlert, color: 'var(--accent-amber)', raw: '#f59e0b' },
-              { name: 'Fundamental Agent', icon: BookOpen, color: 'var(--accent-rose)', raw: '#f472b6' },
-              { name: 'Portfolio Agent', icon: Briefcase, color: 'var(--accent-emerald)', raw: '#34d399' },
-              { name: 'CIO Orchestrator', icon: Users, color: 'var(--accent-cyan)', raw: '#22d3ee' },
+              { name: 'News Sentiment', icon: Newspaper, color: 'var(--accent-blue)', raw: '#3b82f6' },
+              { name: 'Technical Analysis', icon: TrendingUp, color: 'var(--accent-purple)', raw: '#8b5cf6' },
+              { name: 'Risk Scenarios', icon: ShieldAlert, color: 'var(--accent-amber)', raw: '#f59e0b' },
+              { name: 'Fundamental Metrics', icon: BookOpen, color: 'var(--accent-rose)', raw: '#ec4899' },
+              { name: 'Portfolio Allocation', icon: Briefcase, color: 'var(--accent-emerald)', raw: '#10b981' },
+              { name: 'CIO Advisory Synth', icon: Users, color: 'var(--accent-cyan)', raw: '#06b6d4' },
             ].map(({ name, icon: Icon, color, raw }) => (
               <div
                 key={name}
@@ -417,7 +417,7 @@ export default function Dashboard() {
                 <div className="flex items-center space-x-2">
                   <span className="status-dot status-dot-online" />
                   <span className="text-[10px] font-medium" style={{ color: 'var(--accent-emerald)' }}>
-                    Ready
+                    Active
                   </span>
                 </div>
               </div>
