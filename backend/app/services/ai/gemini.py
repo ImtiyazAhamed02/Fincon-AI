@@ -20,6 +20,20 @@ from app.core.logger import logger
 
 from typing import Any
 
+# ── Patch LangChain tenacity retry loop ───────────────────────────────────────
+# By default, langchain_google_genai's _create_retry_decorator retries 10 times
+# with exponential backoff (2s, 4s, 8s, 16s, 32s, 64s = ~126s total) on 429
+# ResourceExhausted before raising the exception. This causes agent runs to hang
+# for > 2 minutes whenever Gemini free quota is exhausted.
+# We patch it to stop after attempt 1 so SmartLLM can failover to Groq instantly (< 0.5s).
+try:
+    import langchain_google_genai.chat_models as _cm
+    from tenacity import retry, stop_after_attempt
+
+    _cm._create_retry_decorator = lambda: retry(stop=stop_after_attempt(1), reraise=True)
+except Exception as _patch_err:
+    logger.debug(f"[GeminiService] Could not patch tenacity retry decorator: {_patch_err}")
+
 try:
     from crewai import LLM
     HAS_CREWAI_LLM = True

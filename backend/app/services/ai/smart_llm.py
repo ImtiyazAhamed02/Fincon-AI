@@ -135,9 +135,16 @@ class SmartLLM(BaseChatModel):
         return time.time() < self._fallback_until
 
     def _activate_fallback(self, reason: str = "", permanent: bool = False) -> None:
-        # If Gemini key is invalid, probe again after a short 30s window
-        # (not 5 min) to avoid locking out for too long during key rotation.
-        ttl = 30.0 if permanent else _FALLBACK_TTL
+        # If Gemini hit a daily quota (e.g. 20 requests/day limit), stay in fallback
+        # for 30 minutes (1800s) instead of attempting Gemini again in 60s.
+        reason_lower = str(reason).lower()
+        if "per day" in reason_lower or "daily" in reason_lower or "day limit" in reason_lower:
+            ttl = 1800.0
+        elif permanent:
+            ttl = 30.0
+        else:
+            ttl = _FALLBACK_TTL
+
         object.__setattr__(self, "_fallback_until", time.time() + ttl)
         logger.warning(
             f"[SmartLLM] Gemini unavailable ({reason}) — "

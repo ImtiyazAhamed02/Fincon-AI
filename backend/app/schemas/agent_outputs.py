@@ -294,26 +294,49 @@ def parse_and_validate_output(raw_text: str, schema_cls: type) -> tuple[Optional
         evidence = []
         risks = []
 
-        # Extract sections if markdown
-        sections = re.split(r"(?m)^#{1,4}\s+", raw_text)
-        for sec in sections:
-            sec = sec.strip()
-            if not sec:
-                continue
-            lower_head = sec.split("\n")[0].lower()
-            content = "\n".join(sec.split("\n")[1:]).strip()
+        # Extract sections if markdown (supports # headers and **Header:** bold blocks)
+        headers = list(re.finditer(r"(?:^|\n)(?:#{1,4}\s+|\*\*(.*?)\*\*[:\s]*)", raw_text))
+        if headers:
+            for i in range(len(headers)):
+                start = headers[i].start()
+                end = headers[i+1].start() if i + 1 < len(headers) else len(raw_text)
+                sec = raw_text[start:end].strip()
+                if not sec:
+                    continue
+                lower_head = sec.split("\n")[0].lower()
+                content = "\n".join(sec.split("\n")[1:]).strip()
 
-            if any(k in lower_head for k in ("what happened", "summary", "conclusion", "verdict")):
-                summary += (" " + content).strip()
-            elif any(k in lower_head for k in ("findings", "why it matters")):
-                bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
-                key_findings.extend([b for b in bullets if b])
-            elif any(k in lower_head for k in ("evidence", "data", "metrics")):
-                bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
-                evidence.extend([b for b in bullets if b])
-            elif any(k in lower_head for k in ("risk", "vulnerabilit")):
-                bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
-                risks.extend([b for b in bullets if b])
+                if any(k in lower_head for k in ("what happened", "summary", "conclusion", "verdict")):
+                    summary += (" " + content).strip()
+                elif any(k in lower_head for k in ("findings", "why it matters")):
+                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    key_findings.extend([b for b in bullets if b])
+                elif any(k in lower_head for k in ("evidence", "data", "metrics")):
+                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    evidence.extend([b for b in bullets if b])
+                elif any(k in lower_head for k in ("risk", "vulnerabilit", "watchpoint")):
+                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    risks.extend([b for b in bullets if b])
+        else:
+            sections = re.split(r"(?m)^#{1,4}\s+", raw_text)
+            for sec in sections:
+                sec = sec.strip()
+                if not sec:
+                    continue
+                lower_head = sec.split("\n")[0].lower()
+                content = "\n".join(sec.split("\n")[1:]).strip()
+
+                if any(k in lower_head for k in ("what happened", "summary", "conclusion", "verdict")):
+                    summary += (" " + content).strip()
+                elif any(k in lower_head for k in ("findings", "why it matters")):
+                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    key_findings.extend([b for b in bullets if b])
+                elif any(k in lower_head for k in ("evidence", "data", "metrics")):
+                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    evidence.extend([b for b in bullets if b])
+                elif any(k in lower_head for k in ("risk", "vulnerabilit", "watchpoint")):
+                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    risks.extend([b for b in bullets if b])
 
         if not summary:
             # Fall back to first couple sentences

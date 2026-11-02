@@ -243,7 +243,7 @@ class FinancialCrew:
             conf_score = ConfidenceService.evaluate_single_agent_confidence(
                 "News Agent", model, execution_success=True
             )
-            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+            display_result = raw_res if ("##" in raw_res and len(raw_res) > 200) else (model.to_markdown(ticker=ticker) if model else raw_res)
         else:
             model = None
             val_err = err_msg
@@ -320,7 +320,7 @@ class FinancialCrew:
             conf_score = ConfidenceService.evaluate_single_agent_confidence(
                 "Technical Agent", model, execution_success=True
             )
-            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+            display_result = raw_res if ("##" in raw_res and len(raw_res) > 200) else (model.to_markdown(ticker=ticker) if model else raw_res)
         else:
             model = None
             val_err = err_msg
@@ -397,7 +397,7 @@ class FinancialCrew:
             conf_score = ConfidenceService.evaluate_single_agent_confidence(
                 "Risk Agent", model, execution_success=True
             )
-            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+            display_result = raw_res if ("##" in raw_res and len(raw_res) > 200) else (model.to_markdown(ticker=ticker) if model else raw_res)
         else:
             model = None
             val_err = err_msg
@@ -474,7 +474,7 @@ class FinancialCrew:
             conf_score = ConfidenceService.evaluate_single_agent_confidence(
                 "Fundamental Agent", model, execution_success=True
             )
-            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+            display_result = raw_res if ("##" in raw_res and len(raw_res) > 200) else (model.to_markdown(ticker=ticker) if model else raw_res)
         else:
             model = None
             val_err = err_msg
@@ -552,7 +552,7 @@ class FinancialCrew:
             conf_score = ConfidenceService.evaluate_single_agent_confidence(
                 "Portfolio Agent", model, execution_success=True
             )
-            display_result = model.to_markdown(portfolio_id=p_id) if model else raw_res
+            display_result = raw_res if ("##" in raw_res and len(raw_res) > 200) else (model.to_markdown(portfolio_id=p_id) if model else raw_res)
         else:
             model = None
             val_err = err_msg
