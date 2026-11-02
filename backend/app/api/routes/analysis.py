@@ -38,7 +38,11 @@ def analyze_news(request: NewsAnalysisRequest):
     try:
         crew = get_financial_crew()
         result = crew.analyze_news(ticker=request.ticker)
+        if result.get("status") == "FAILED":
+            raise HTTPException(status_code=500, detail=result.get("error") or result.get("result"))
         return {"status": "success", **result}
+    except HTTPException:
+        raise
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -53,7 +57,11 @@ def analyze_technical(request: TechnicalAnalysisRequest):
     try:
         crew = get_financial_crew()
         result = crew.analyze_technical(ticker=request.ticker)
+        if result.get("status") == "FAILED":
+            raise HTTPException(status_code=500, detail=result.get("error") or result.get("result"))
         return {"status": "success", **result}
+    except HTTPException:
+        raise
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -68,7 +76,11 @@ def analyze_risk(request: RiskAnalysisRequest):
     try:
         crew = get_financial_crew()
         result = crew.analyze_risk(ticker=request.ticker)
+        if result.get("status") == "FAILED":
+            raise HTTPException(status_code=500, detail=result.get("error") or result.get("result"))
         return {"status": "success", **result}
+    except HTTPException:
+        raise
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -84,7 +96,11 @@ def analyze_portfolio(request: PortfolioAnalysisRequest = None):
         crew = get_financial_crew()
         p_id = request.portfolio_id if request else None
         result = crew.analyze_portfolio(portfolio_id=p_id)
+        if result.get("status") == "FAILED":
+            raise HTTPException(status_code=500, detail=result.get("error") or result.get("result"))
         return {"status": "success", **result}
+    except HTTPException:
+        raise
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -99,7 +115,11 @@ def analyze_fundamental(request: FundamentalAnalysisRequest):
     try:
         crew = get_financial_crew()
         result = crew.analyze_fundamental(ticker=request.ticker)
+        if result.get("status") == "FAILED":
+            raise HTTPException(status_code=500, detail=result.get("error") or result.get("result"))
         return {"status": "success", **result}
+    except HTTPException:
+        raise
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

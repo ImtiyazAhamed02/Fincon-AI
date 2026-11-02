@@ -40,11 +40,10 @@ _QUOTA_KEYWORDS = (
     "api key invalid", "api_key_invalid", "401",
 )
 
-# Gemini REST probe endpoint (no retries, fast)
-# Model is resolved from settings at call time so it stays in sync with .env
+# Gemini REST probe endpoint
 _GEMINI_PROBE_BASE = "https://generativelanguage.googleapis.com/v1beta/models/"
 _PROBE_TIMEOUT = 5  # seconds
-_FALLBACK_TTL  = 300.0  # 5 minutes
+_FALLBACK_TTL  = 60.0  # 60s cooldown (enough for 15 RPM per-minute quota to reset)
 
 
 def _is_quota_error(error: Exception) -> bool:
@@ -172,18 +171,12 @@ class SmartLLM(BaseChatModel):
         **kwargs,
     ) -> ChatResult:
         with self._lock:
-            # ── Fast path: Gemini known down → Grok ───────────────────────
+            # ── Fast path: Gemini in cooldown → Grok ───────────────────────
             if self._is_fallback_active():
                 logger.info("[SmartLLM] Gemini in cooldown — routing to Grok.")
                 return self._call_fallback(messages, stop, **kwargs)
 
-            # ── Probe Gemini before calling (< 5s, no retries) ────────────
-            logger.info("[SmartLLM] Probing Gemini availability...")
-            if not self._gemini_is_available():
-                # _activate_fallback already called inside _gemini_is_available
-                return self._call_fallback(messages, stop, **kwargs)
-
-            # ── Gemini confirmed available — call it ──────────────────────
+            # ── Call Gemini directly (avoids wasting RPM quota on dummy probes) ──
             try:
                 logger.info("[SmartLLM] Calling Gemini LLM...")
                 primary = self._get_primary()
@@ -191,10 +184,13 @@ class SmartLLM(BaseChatModel):
                 logger.info("[SmartLLM] Gemini OK.")
                 return result
             except Exception as e:
+                err_str = str(e)
+                object.__setattr__(self, "_gemini_last_error", err_str)
                 if _is_quota_error(e):
-                    self._activate_fallback(f"mid-call quota: {type(e).__name__}")
-                    return self._call_fallback(messages, stop, **kwargs)
-                logger.warning(f"[SmartLLM] Gemini error: {type(e).__name__} — trying Grok.")
+                    self._activate_fallback(f"quota exceeded: {err_str[:120]}")
+                else:
+                    logger.warning(f"[SmartLLM] Gemini error ({type(e).__name__}): {err_str[:120]} — routing to Grok.")
+                    self._activate_fallback(f"Gemini error: {err_str[:120]}")
                 return self._call_fallback(messages, stop, **kwargs)
 
     def _call_fallback(

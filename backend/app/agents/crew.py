@@ -238,11 +238,17 @@ class FinancialCrew:
         dur = time.time() - t0
         en_iso = _iso_now()
 
-        # Structured validation
-        model, val_err = parse_and_validate_output(raw_res, NewsAnalysisOutput)
-        conf_score = ConfidenceService.evaluate_single_agent_confidence(
-            "News Agent", model, execution_success=(status == "SUCCESS")
-        )
+        if status == "SUCCESS":
+            model, val_err = parse_and_validate_output(raw_res, NewsAnalysisOutput)
+            conf_score = ConfidenceService.evaluate_single_agent_confidence(
+                "News Agent", model, execution_success=True
+            )
+            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+        else:
+            model = None
+            val_err = err_msg
+            display_result = raw_res
+            conf_score = 15.0
 
         self._log_agent_run(
             agent_name="News Agent",
@@ -257,8 +263,6 @@ class FinancialCrew:
             confidence_score=conf_score,
         )
 
-        display_result = model.to_markdown(ticker=ticker) if model else raw_res
-
         return {
             "session_id": self.session_id,
             "agent": "news",
@@ -267,6 +271,7 @@ class FinancialCrew:
             "structured_output": model.model_dump() if model else None,
             "confidence_score": conf_score,
             "status": status,
+            "error": err_msg,
         }
 
     @rate_limited_gemini
@@ -310,10 +315,17 @@ class FinancialCrew:
         dur = time.time() - t0
         en_iso = _iso_now()
 
-        model, val_err = parse_and_validate_output(raw_res, TechnicalAnalysisOutput)
-        conf_score = ConfidenceService.evaluate_single_agent_confidence(
-            "Technical Agent", model, execution_success=(status == "SUCCESS")
-        )
+        if status == "SUCCESS":
+            model, val_err = parse_and_validate_output(raw_res, TechnicalAnalysisOutput)
+            conf_score = ConfidenceService.evaluate_single_agent_confidence(
+                "Technical Agent", model, execution_success=True
+            )
+            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+        else:
+            model = None
+            val_err = err_msg
+            display_result = raw_res
+            conf_score = 15.0
 
         self._log_agent_run(
             agent_name="Technical Agent",
@@ -328,8 +340,6 @@ class FinancialCrew:
             confidence_score=conf_score,
         )
 
-        display_result = model.to_markdown(ticker=ticker) if model else raw_res
-
         return {
             "session_id": self.session_id,
             "agent": "technical",
@@ -338,6 +348,7 @@ class FinancialCrew:
             "structured_output": model.model_dump() if model else None,
             "confidence_score": conf_score,
             "status": status,
+            "error": err_msg,
         }
 
     @rate_limited_gemini
@@ -381,10 +392,17 @@ class FinancialCrew:
         dur = time.time() - t0
         en_iso = _iso_now()
 
-        model, val_err = parse_and_validate_output(raw_res, RiskAnalysisOutput)
-        conf_score = ConfidenceService.evaluate_single_agent_confidence(
-            "Risk Agent", model, execution_success=(status == "SUCCESS")
-        )
+        if status == "SUCCESS":
+            model, val_err = parse_and_validate_output(raw_res, RiskAnalysisOutput)
+            conf_score = ConfidenceService.evaluate_single_agent_confidence(
+                "Risk Agent", model, execution_success=True
+            )
+            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+        else:
+            model = None
+            val_err = err_msg
+            display_result = raw_res
+            conf_score = 15.0
 
         self._log_agent_run(
             agent_name="Risk Agent",
@@ -399,8 +417,6 @@ class FinancialCrew:
             confidence_score=conf_score,
         )
 
-        display_result = model.to_markdown(ticker=ticker) if model else raw_res
-
         return {
             "session_id": self.session_id,
             "agent": "risk",
@@ -409,6 +425,7 @@ class FinancialCrew:
             "structured_output": model.model_dump() if model else None,
             "confidence_score": conf_score,
             "status": status,
+            "error": err_msg,
         }
 
     @rate_limited_gemini
@@ -452,10 +469,17 @@ class FinancialCrew:
         dur = time.time() - t0
         en_iso = _iso_now()
 
-        model, val_err = parse_and_validate_output(raw_res, FundamentalAnalysisOutput)
-        conf_score = ConfidenceService.evaluate_single_agent_confidence(
-            "Fundamental Agent", model, execution_success=(status == "SUCCESS")
-        )
+        if status == "SUCCESS":
+            model, val_err = parse_and_validate_output(raw_res, FundamentalAnalysisOutput)
+            conf_score = ConfidenceService.evaluate_single_agent_confidence(
+                "Fundamental Agent", model, execution_success=True
+            )
+            display_result = model.to_markdown(ticker=ticker) if model else raw_res
+        else:
+            model = None
+            val_err = err_msg
+            display_result = raw_res
+            conf_score = 15.0
 
         self._log_agent_run(
             agent_name="Fundamental Agent",
@@ -470,8 +494,6 @@ class FinancialCrew:
             confidence_score=conf_score,
         )
 
-        display_result = model.to_markdown(ticker=ticker) if model else raw_res
-
         return {
             "session_id": self.session_id,
             "agent": "fundamental",
@@ -480,6 +502,7 @@ class FinancialCrew:
             "structured_output": model.model_dump() if model else None,
             "confidence_score": conf_score,
             "status": status,
+            "error": err_msg,
         }
 
     @rate_limited_gemini
@@ -524,10 +547,17 @@ class FinancialCrew:
         dur = time.time() - t0
         en_iso = _iso_now()
 
-        model, val_err = parse_and_validate_output(raw_res, PortfolioAnalysisOutput)
-        conf_score = ConfidenceService.evaluate_single_agent_confidence(
-            "Portfolio Agent", model, execution_success=(status == "SUCCESS")
-        )
+        if status == "SUCCESS":
+            model, val_err = parse_and_validate_output(raw_res, PortfolioAnalysisOutput)
+            conf_score = ConfidenceService.evaluate_single_agent_confidence(
+                "Portfolio Agent", model, execution_success=True
+            )
+            display_result = model.to_markdown(portfolio_id=p_id) if model else raw_res
+        else:
+            model = None
+            val_err = err_msg
+            display_result = raw_res
+            conf_score = 15.0
 
         self._log_agent_run(
             agent_name="Portfolio Agent",
@@ -542,8 +572,6 @@ class FinancialCrew:
             confidence_score=conf_score,
         )
 
-        display_result = model.to_markdown(portfolio_id=p_id) if model else raw_res
-
         return {
             "session_id": self.session_id,
             "agent": "portfolio",
@@ -552,6 +580,7 @@ class FinancialCrew:
             "structured_output": model.model_dump() if model else None,
             "confidence_score": conf_score,
             "status": status,
+            "error": err_msg,
         }
 
     # ─────────────────────────────────────────────────────────────────────────
