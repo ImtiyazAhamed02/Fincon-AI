@@ -59,10 +59,10 @@ def _probe_gemini(api_key: str) -> tuple[bool, str]:
     """
     try:
         from app.core.config import settings
-        model = getattr(settings, "GEMINI_MODEL", "gemini-2.0-flash")
+        model = getattr(settings, "GEMINI_MODEL", "gemini-2.5-flash")
         probe_url = f"{_GEMINI_PROBE_BASE}{model}:generateContent"
     except Exception:
-        probe_url = f"{_GEMINI_PROBE_BASE}gemini-2.0-flash:generateContent"
+        probe_url = f"{_GEMINI_PROBE_BASE}gemini-2.5-flash:generateContent"
     try:
         resp = _requests.post(
             probe_url,
