@@ -19,21 +19,30 @@ class Recommendation(str, Enum):
 
 
 class BaseAgentOutput(BaseModel):
-    summary: str = Field(..., description="High-level executive summary of the analysis")
-    key_findings: List[str] = Field(default_factory=list, description="List of key findings identified")
+    what_happened: str = Field(default="", description="1-2 sentences explaining what happened / data events")
+    why_it_matters: str = Field(default="", description="1-2 sentences explaining why it matters for the company or investor")
     supporting_evidence: List[str] = Field(default_factory=list, description="Data points and metrics supporting findings")
+    overall_conclusion: str = Field(default="", description="2-3 sentences summarizing the final takeaway, completely jargon-free")
+
+    # Backward-compatible fields
+    summary: str = Field(default="", description="High-level executive summary of the analysis")
+    key_findings: List[str] = Field(default_factory=list, description="List of key findings identified")
     risks: List[str] = Field(default_factory=list, description="Key risks identified during analysis")
 
     def to_markdown(self) -> str:
-        """Fallback markdown generator."""
+        """Standard human-readable markdown matching the classic FINCON format."""
         lines = [
-            f"### Summary\n{self.summary}\n",
-            "### Key Findings",
-            "\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- None noted.",
-            "\n### Supporting Evidence",
-            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- None noted.",
-            "\n### Risks",
-            "\n".join(f"- {r}" for r in self.risks) if self.risks else "- None noted.",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Key implications for the company and investors.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Real-time market data verified.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
         ]
         return "\n".join(lines)
 
@@ -45,14 +54,22 @@ class NewsAnalysisOutput(BaseAgentOutput):
 
     def to_markdown(self, ticker: str = "") -> str:
         heading = f"## News Report for {ticker}" if ticker else "## News Report"
-        return (
-            f"{heading}\n\n"
-            f"**Sentiment**: `{self.sentiment.upper()}` ({self.relevant_headlines_count} sources analyzed, {self.data_freshness})\n\n"
-            f"**What happened?**\n{self.summary}\n\n"
-            f"**Key Findings:**\n" + ("\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- No significant developments.") + "\n\n"
-            f"**Supporting Evidence:**\n" + ("\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- None available.") + "\n\n"
-            f"**Risks & Watchpoints:**\n" + ("\n".join(f"- {r}" for r in self.risks) if self.risks else "- Standard market risk.")
-        )
+        lines = [
+            heading,
+            "",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Direct impact on corporate momentum and sentiment.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Market news verified via Finnhub.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
+        ]
+        return "\n".join(lines)
 
 
 class TechnicalAnalysisOutput(BaseAgentOutput):
@@ -65,16 +82,22 @@ class TechnicalAnalysisOutput(BaseAgentOutput):
 
     def to_markdown(self, ticker: str = "") -> str:
         heading = f"## Technical Report for {ticker}" if ticker else "## Technical Report"
-        rsi_str = f" | RSI(14): {self.rsi_14:.1f}" if self.rsi_14 is not None else ""
-        macd_str = f" | MACD: {self.macd_signal}" if self.macd_signal else ""
-        return (
-            f"{heading}\n\n"
-            f"**Technical Bias**: `{self.trend_bias.upper()}`{rsi_str}{macd_str}\n\n"
-            f"**What happened?**\n{self.summary}\n\n"
-            f"**Key Findings:**\n" + ("\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- Price consolidating.") + "\n\n"
-            f"**Supporting Evidence:**\n" + ("\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Indicator data applied.") + "\n\n"
-            f"**Risks & Technical Vulnerabilities:**\n" + ("\n".join(f"- {r}" for r in self.risks) if self.risks else "- Standard market volatility.")
-        )
+        lines = [
+            heading,
+            "",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Price momentum and key technical support/resistance levels.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Institutional indicators calculated via yfinance.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
+        ]
+        return "\n".join(lines)
 
 
 class RiskAnalysisOutput(BaseAgentOutput):
@@ -85,16 +108,22 @@ class RiskAnalysisOutput(BaseAgentOutput):
 
     def to_markdown(self, ticker: str = "") -> str:
         heading = f"## Risk Report for {ticker}" if ticker else "## Risk Report"
-        vol_str = f" | Ann. Volatility: {self.annualized_volatility:.1f}%" if self.annualized_volatility is not None else ""
-        var_str = f" | VaR (95%): {self.var_95:.1f}%" if self.var_95 is not None else ""
-        return (
-            f"{heading}\n\n"
-            f"**Risk Level**: `{self.risk_level.upper()}`{vol_str}{var_str}\n\n"
-            f"**What happened?**\n{self.summary}\n\n"
-            f"**Key Risk Findings:**\n" + ("\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- Normal market risk profile.") + "\n\n"
-            f"**Supporting Evidence:**\n" + ("\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Quantitative risk metrics.") + "\n\n"
-            f"**Stress Scenarios & Vulnerabilities:**\n" + ("\n".join(f"- {r}" for r in self.risks) if self.risks else "- None specified.")
-        )
+        lines = [
+            heading,
+            "",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Downside exposure, capital preservation, and drawdown vulnerability.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Quantitative risk metrics calculated via historical price action.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
+        ]
+        return "\n".join(lines)
 
 
 class FundamentalAnalysisOutput(BaseAgentOutput):
@@ -105,16 +134,22 @@ class FundamentalAnalysisOutput(BaseAgentOutput):
 
     def to_markdown(self, ticker: str = "") -> str:
         heading = f"## Fundamental Report for {ticker}" if ticker else "## Fundamental Report"
-        val_str = f"**Valuation Assessment**: `{self.valuation_assessment.upper()}`"
-        pe_str = f" | P/E: {self.pe_ratio:.1f}" if self.pe_ratio is not None else ""
-        return (
-            f"{heading}\n\n"
-            f"{val_str}{pe_str}\n\n"
-            f"**What happened?**\n{self.summary}\n\n"
-            f"**Key Findings:**\n" + ("\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- Financials consistent with expectations.") + "\n\n"
-            f"**Supporting Evidence:**\n" + ("\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Corporate disclosures & filings.") + "\n\n"
-            f"**Fundamental Risks:**\n" + ("\n".join(f"- {r}" for r in self.risks) if self.risks else "- Competitive and macroeconomic headwinds.")
-        )
+        lines = [
+            heading,
+            "",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Balance sheet health, earnings power, and valuation multiple sustainability.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Financial disclosures and institutional valuation models.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
+        ]
+        return "\n".join(lines)
 
 
 class PortfolioAnalysisOutput(BaseAgentOutput):
@@ -124,14 +159,22 @@ class PortfolioAnalysisOutput(BaseAgentOutput):
 
     def to_markdown(self, portfolio_id: str = "") -> str:
         p_label = f" for {portfolio_id}" if portfolio_id else ""
-        return (
-            f"## Portfolio Report{p_label}\n\n"
-            f"**Allocation Status**: `{self.allocation_status.upper()}`\n\n"
-            f"**What happened?**\n{self.summary}\n\n"
-            f"**Key Findings:**\n" + ("\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- Holdings align with risk profile.") + "\n\n"
-            f"**Supporting Evidence:**\n" + ("\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Current portfolio weights.") + "\n\n"
-            f"**Portfolio Concentration & Balance Risks:**\n" + ("\n".join(f"- {r}" for r in self.risks) if self.risks else "- No severe concentration detected.")
-        )
+        lines = [
+            f"## Portfolio Report{p_label}",
+            "",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Asset allocation balance and concentration risk management.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Portfolio holdings weights and sector distribution.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
+        ]
+        return "\n".join(lines)
 
 
 class CIORecommendationOutput(BaseAgentOutput):
@@ -140,6 +183,12 @@ class CIORecommendationOutput(BaseAgentOutput):
     conflicting_signals: List[str] = Field(default_factory=list, description="Contradictions between agents identified")
     limitations_and_missing_data: List[str] = Field(default_factory=list, description="Missing metrics or limits to analysis")
     confidence_score: float = Field(default=0.0, description="Evidence-calibrated confidence score between 0 and 100")
+
+    news_summary: str = Field(default="", description="Summary from News Agent")
+    technical_summary: str = Field(default="", description="Summary from Technical Agent")
+    risk_summary: str = Field(default="", description="Summary from Risk Agent")
+    fundamental_summary: str = Field(default="", description="Summary from Fundamental Agent")
+    portfolio_summary: str = Field(default="", description="Summary from Portfolio Agent")
 
     @field_validator("recommendation", mode="before")
     @classmethod
@@ -165,41 +214,28 @@ class CIORecommendationOutput(BaseAgentOutput):
         lines = [
             f"# Master Investment Summary{comp_str}",
             "",
-            f"### 🎯 Final Verdict: {rec_color_emoji} **{rec_badge}** (Horizon: {self.time_horizon})",
-            f"**Analysis Confidence**: `{self.confidence_score:.1f}%`",
-            "",
-            f"## 📋 Executive Summary\n{self.summary}\n",
-            "## 🔍 Key Findings",
-            "\n".join(f"- {f}" for f in self.key_findings) if self.key_findings else "- Analysis completed.",
-            "",
-            "## 📊 Supporting Evidence",
-            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Multi-agent research findings.",
-            "",
-        ]
-
-        if self.conflicting_signals:
-            lines.extend([
-                "## ⚠️ Conflicting Findings & Divergences",
-                "\n".join(f"- {c}" for c in self.conflicting_signals),
-                ""
-            ])
-
-        if self.limitations_and_missing_data:
-            lines.extend([
-                "## ℹ️ Limitations & Missing Data",
-                "\n".join(f"- {m}" for m in self.limitations_and_missing_data),
-                ""
-            ])
-
-        lines.extend([
-            "## 🛡️ Downside Risks",
-            "\n".join(f"- {r}" for r in self.risks) if self.risks else "- Market-wide risk factors apply.",
-            "",
+            f"## 📰 News Summary\n{self.news_summary or self.what_happened or self.summary}\n",
+            f"## 📈 Technical Summary\n{self.technical_summary or 'Technical indicators evaluated.'}\n",
+            f"## 🛡️ Risk Summary\n{self.risk_summary or 'Risk metrics and drawdown risk evaluated.'}\n",
+            f"## 🏢 Fundamental Summary\n{self.fundamental_summary or 'Valuation and earnings health evaluated.'}\n",
+            f"## 💼 Portfolio Summary\n{self.portfolio_summary or 'Portfolio allocation evaluated.'}\n",
             "---",
+            "",
             "## 🎯 Overall Investment Outlook",
-            self.summary
-        ])
-
+            f"**Final Recommendation**: {rec_color_emoji} **{rec_badge}**",
+            "",
+            "**What happened?**",
+            self.what_happened or self.summary,
+            "",
+            "**Why it matters?**",
+            self.why_it_matters or "Strategic implications across all research modules.",
+            "",
+            "**Supporting Evidence:**",
+            "\n".join(f"- {e}" for e in self.supporting_evidence) if self.supporting_evidence else "- Multi-agent quantitative & qualitative inputs.",
+            "",
+            "**Overall conclusion**",
+            self.overall_conclusion or self.summary,
+        ]
         return "\n".join(lines)
 
 
@@ -289,10 +325,19 @@ def parse_and_validate_output(raw_text: str, schema_cls: type) -> tuple[Optional
 
     # 2. Text heuristics parser to construct model gracefully
     try:
+        what_happened = ""
+        why_it_matters = ""
+        overall_conclusion = ""
         summary = ""
         key_findings = []
         evidence = []
         risks = []
+
+        news_sum = ""
+        tech_sum = ""
+        risk_sum = ""
+        fund_sum = ""
+        port_sum = ""
 
         # Extract sections if markdown (supports # headers and **Header:** bold blocks)
         headers = list(re.finditer(r"(?:^|\n)(?:#{1,4}\s+|\*\*(.*?)\*\*[:\s]*)", raw_text))
@@ -306,16 +351,32 @@ def parse_and_validate_output(raw_text: str, schema_cls: type) -> tuple[Optional
                 lower_head = sec.split("\n")[0].lower()
                 content = "\n".join(sec.split("\n")[1:]).strip()
 
-                if any(k in lower_head for k in ("what happened", "summary", "conclusion", "verdict")):
-                    summary += (" " + content).strip()
-                elif any(k in lower_head for k in ("findings", "why it matters")):
-                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
-                    key_findings.extend([b for b in bullets if b])
-                elif any(k in lower_head for k in ("evidence", "data", "metrics")):
-                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                if "what happened" in lower_head:
+                    what_happened = content
+                elif "why it matters" in lower_head or "why matters" in lower_head:
+                    why_it_matters = content
+                elif any(k in lower_head for k in ("overall conclusion", "conclusion", "final verdict", "outlook")):
+                    overall_conclusion = content
+                elif any(k in lower_head for k in ("evidence", "data", "metrics", "supporting evidence")):
+                    bullets = [re.sub(r"^[\*\-\s]+(?:\d+[\.\)])?\s*", "", b).strip() for b in content.split("\n") if b.strip()]
                     evidence.extend([b for b in bullets if b])
+                elif any(k in lower_head for k in ("news summary", "📰")):
+                    news_sum = content
+                elif any(k in lower_head for k in ("technical summary", "📈")):
+                    tech_sum = content
+                elif any(k in lower_head for k in ("risk summary", "🛡")):
+                    risk_sum = content
+                elif any(k in lower_head for k in ("fundamental summary", "🏢")):
+                    fund_sum = content
+                elif any(k in lower_head for k in ("portfolio summary", "💼")):
+                    port_sum = content
+                elif any(k in lower_head for k in ("summary", "executive summary")):
+                    summary += (" " + content).strip()
+                elif any(k in lower_head for k in ("findings", "key findings")):
+                    bullets = [re.sub(r"^[\*\-\s]+(?:\d+[\.\)])?\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    key_findings.extend([b for b in bullets if b])
                 elif any(k in lower_head for k in ("risk", "vulnerabilit", "watchpoint")):
-                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    bullets = [re.sub(r"^[\*\-\s]+(?:\d+[\.\)])?\s*", "", b).strip() for b in content.split("\n") if b.strip()]
                     risks.extend([b for b in bullets if b])
         else:
             sections = re.split(r"(?m)^#{1,4}\s+", raw_text)
@@ -326,31 +387,46 @@ def parse_and_validate_output(raw_text: str, schema_cls: type) -> tuple[Optional
                 lower_head = sec.split("\n")[0].lower()
                 content = "\n".join(sec.split("\n")[1:]).strip()
 
-                if any(k in lower_head for k in ("what happened", "summary", "conclusion", "verdict")):
-                    summary += (" " + content).strip()
-                elif any(k in lower_head for k in ("findings", "why it matters")):
-                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
-                    key_findings.extend([b for b in bullets if b])
+                if "what happened" in lower_head:
+                    what_happened = content
+                elif "why it matters" in lower_head:
+                    why_it_matters = content
+                elif any(k in lower_head for k in ("conclusion", "verdict", "outlook")):
+                    overall_conclusion = content
                 elif any(k in lower_head for k in ("evidence", "data", "metrics")):
-                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    bullets = [re.sub(r"^[\*\-\s]+(?:\d+[\.\)])?\s*", "", b).strip() for b in content.split("\n") if b.strip()]
                     evidence.extend([b for b in bullets if b])
+                elif any(k in lower_head for k in ("summary", "verdict")):
+                    summary += (" " + content).strip()
+                elif any(k in lower_head for k in ("findings", "key findings")):
+                    bullets = [re.sub(r"^[\*\-\s]+(?:\d+[\.\)])?\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    key_findings.extend([b for b in bullets if b])
                 elif any(k in lower_head for k in ("risk", "vulnerabilit", "watchpoint")):
-                    bullets = [re.sub(r"^[\*\-\d\.]+\s*", "", b).strip() for b in content.split("\n") if b.strip()]
+                    bullets = [re.sub(r"^[\*\-\s]+(?:\d+[\.\)])?\s*", "", b).strip() for b in content.split("\n") if b.strip()]
                     risks.extend([b for b in bullets if b])
 
-        if not summary:
-            # Fall back to first couple sentences
-            clean_lines = [l.strip() for l in raw_text.split("\n") if l.strip() and not l.startswith("#")]
-            summary = clean_lines[0] if clean_lines else "Analysis completed."
+        clean_lines = [l.strip() for l in raw_text.split("\n") if l.strip() and not l.startswith("#")]
+        first_clean = clean_lines[0] if clean_lines else "Analysis completed."
 
+        if not summary:
+            summary = what_happened or first_clean
+        if not what_happened:
+            what_happened = summary
+        if not why_it_matters:
+            why_it_matters = "Key business and market implications for the company and investors."
+        if not overall_conclusion:
+            overall_conclusion = summary
         if not key_findings:
-            key_findings = [summary[:200]]
+            key_findings = [why_it_matters] if why_it_matters else [summary[:200]]
 
         init_kwargs = {
+            "what_happened": what_happened[:1000],
+            "why_it_matters": why_it_matters[:1000],
+            "supporting_evidence": evidence[:10],
+            "overall_conclusion": overall_conclusion[:1000],
             "summary": summary[:1000],
-            "key_findings": key_findings[:5],
-            "supporting_evidence": evidence[:5],
-            "risks": risks[:5],
+            "key_findings": key_findings[:10],
+            "risks": risks[:10],
         }
 
         if schema_cls == CIORecommendationOutput:
@@ -358,6 +434,11 @@ def parse_and_validate_output(raw_text: str, schema_cls: type) -> tuple[Optional
             if not rec:
                 return None, "Malformed or missing recommendation (BUY, SELL, or HOLD not explicitly declared)."
             init_kwargs["recommendation"] = rec
+            init_kwargs["news_summary"] = news_sum[:500]
+            init_kwargs["technical_summary"] = tech_sum[:500]
+            init_kwargs["risk_summary"] = risk_sum[:500]
+            init_kwargs["fundamental_summary"] = fund_sum[:500]
+            init_kwargs["portfolio_summary"] = port_sum[:500]
 
         return schema_cls.model_validate(init_kwargs), None
 

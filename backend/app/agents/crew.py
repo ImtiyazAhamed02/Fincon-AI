@@ -202,18 +202,18 @@ class FinancialCrew:
         """Run ONLY the News Analyst agent with structured output validation."""
         agent = self._make_news_agent()
         task = Task(
-            description=(
-                f"Use the news tool to fetch all news data for {ticker}. "
-                "Provide a comprehensive beginner-friendly report with sections: "
-                "Summary, Key Findings, Supporting Evidence, Risks, and Sentiment (BULLISH/BEARISH/NEUTRAL)."
-            ),
+            description=f"Use the news tool to fetch all news data for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## News Report for {ticker}\n"
-                "**Sentiment**: [BULLISH / BEARISH / NEUTRAL]\n"
-                "**What happened?**\n[1-2 clear summary sentences]\n\n"
-                "**Key Findings:**\n- [Finding 1]\n- [Finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Headline/Source 1]\n\n"
-                "**Risks & Watchpoints:**\n- [Identified news risk]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -279,18 +279,18 @@ class FinancialCrew:
         """Run ONLY the Technical Analyst agent with structured output validation."""
         agent = self._make_technical_agent()
         task = Task(
-            description=(
-                f"Use the technical tool to fetch indicators for {ticker}. "
-                "Analyze trend bias (BULLISH/BEARISH/NEUTRAL), RSI, MACD, key support/resistance, "
-                "and explain findings clearly for beginners."
-            ),
+            description=f"Use your tool to fetch technical indicators for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## Technical Report for {ticker}\n"
-                "**Technical Bias**: [BULLISH / BEARISH / NEUTRAL]\n"
-                "**What happened?**\n[1-2 clear summary sentences]\n\n"
-                "**Key Findings:**\n- [Indicator finding 1]\n- [Indicator finding 2]\n\n"
-                "**Supporting Evidence:**\n- [RSI/MACD data point]\n\n"
-                "**Risks & Technical Vulnerabilities:**\n- [Key risk/breakdown level]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the price/indicators]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on momentum and trend]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -356,18 +356,18 @@ class FinancialCrew:
         """Run ONLY the Risk Officer agent with structured output validation."""
         agent = self._make_risk_agent()
         task = Task(
-            description=(
-                f"Use the risk metrics tool to evaluate risk for {ticker}. "
-                "Assess annualized volatility, maximum drawdown, VaR, stress tests, "
-                "and classify risk level (LOW / MODERATE / HIGH / EXTREME)."
-            ),
+            description=f"Use your tool to fetch risk metrics for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## Risk Report for {ticker}\n"
-                "**Risk Level**: [LOW / MODERATE / HIGH / EXTREME]\n"
-                "**What happened?**\n[1-2 clear summary sentences]\n\n"
-                "**Key Risk Findings:**\n- [Risk finding 1]\n- [Risk finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Volatility / VaR value]\n\n"
-                "**Stress Scenarios & Vulnerabilities:**\n- [Scenario 1]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining volatility, drawdown, and VaR]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the downside risk for an investor]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -433,18 +433,18 @@ class FinancialCrew:
         """Run ONLY the Fundamental Analyst agent with structured output validation."""
         agent = self._make_fundamental_agent()
         task = Task(
-            description=(
-                f"Use the fundamental tool to evaluate financials for {ticker}. "
-                "Assess valuation (UNDERVALUED / FAIR / OVERVALUED), P/E ratio, margins, "
-                "and corporate health."
-            ),
+            description=f"Use your tool to fetch fundamental data for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## Fundamental Report for {ticker}\n"
-                "**Valuation Assessment**: [UNDERVALUED / FAIR / OVERVALUED]\n"
-                "**What happened?**\n[1-2 clear summary sentences]\n\n"
-                "**Key Findings:**\n- [Fundamental finding 1]\n- [Fundamental finding 2]\n\n"
-                "**Supporting Evidence:**\n- [P/E or margin data]\n\n"
-                "**Fundamental Risks:**\n- [Identified financial headwind]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining earnings, revenue, and valuation]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining business health and profitability]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -511,18 +511,18 @@ class FinancialCrew:
         agent = self._make_portfolio_agent()
         p_id = portfolio_id or "default_portfolio"
         task = Task(
-            description=(
-                f"Use the portfolio tool to retrieve holdings for portfolio '{p_id}'. "
-                "Assess asset allocation (BALANCED / OVERWEIGHT / UNDERWEIGHT), diversification, "
-                "and recommend rebalancing actions."
-            ),
+            description="Use the portfolio tool to retrieve holdings for the active portfolio. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 "## Portfolio Report\n"
-                "**Allocation Status**: [BALANCED / OVERWEIGHT / UNDERWEIGHT]\n"
-                "**What happened?**\n[1-2 clear summary sentences]\n\n"
-                "**Key Findings:**\n- [Holdings finding 1]\n- [Holdings finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Allocation metric]\n\n"
-                "**Portfolio Concentration & Balance Risks:**\n- [Concentration risk]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining current holdings and asset allocation]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining diversification and risk exposure]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing rebalancing recommendations, completely jargon-free]"
             ),
             agent=agent,
         )
@@ -602,86 +602,90 @@ class FinancialCrew:
         manager_agent = self._make_manager_agent()
 
         news_task = Task(
-            description=(
-                f"Use the news tool to fetch and analyze news for {ticker}. "
-                "Produce a structured beginner-friendly report with Summary, Key Findings, "
-                "Supporting Evidence, Risks, and Sentiment (BULLISH/BEARISH/NEUTRAL)."
-            ),
+            description=f"Use the news tool to fetch all news data for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## News Report for {ticker}\n"
-                "**Sentiment**: [BULLISH / BEARISH / NEUTRAL]\n"
-                "**What happened?**\n[1-2 sentences]\n\n"
-                "**Key Findings:**\n- [Finding 1]\n- [Finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Headline 1]\n\n"
-                "**Risks & Watchpoints:**\n- [Risk 1]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the data/events]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on the company or investor]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=news_agent,
             async_execution=True,
         )
 
         tech_task = Task(
-            description=(
-                f"Use the technical tool to compute price indicators for {ticker}. "
-                "Assess trend bias (BULLISH/BEARISH/NEUTRAL), RSI, MACD, and key support/resistance levels."
-            ),
+            description=f"Use your tool to fetch technical indicators for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## Technical Report for {ticker}\n"
-                "**Technical Bias**: [BULLISH / BEARISH / NEUTRAL]\n"
-                "**What happened?**\n[1-2 sentences]\n\n"
-                "**Key Findings:**\n- [Finding 1]\n- [Finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Indicator 1]\n\n"
-                "**Risks & Technical Vulnerabilities:**\n- [Risk 1]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining the price/indicators]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining the impact on momentum and trend]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=tech_agent,
             async_execution=True,
         )
 
         risk_task = Task(
-            description=(
-                f"Use the risk metrics tool to evaluate volatility, drawdown, and VaR for {ticker}. "
-                "Classify risk level (LOW/MODERATE/HIGH/EXTREME) and assess market vulnerabilities."
-            ),
+            description=f"Use your tool to fetch risk metrics for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## Risk Report for {ticker}\n"
-                "**Risk Level**: [LOW / MODERATE / HIGH / EXTREME]\n"
-                "**What happened?**\n[1-2 sentences]\n\n"
-                "**Key Risk Findings:**\n- [Finding 1]\n- [Finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Risk metric 1]\n\n"
-                "**Stress Scenarios & Vulnerabilities:**\n- [Scenario 1]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining volatility, drawdown, and VaR]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining downside risk for an investor]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=risk_agent,
             context=[news_task, tech_task],
         )
 
         fund_task = Task(
-            description=(
-                f"Use the fundamental tool to assess company valuation, earnings, and financial health for {ticker}. "
-                "Classify valuation (UNDERVALUED/FAIR/OVERVALUED)."
-            ),
+            description=f"Use your tool to fetch fundamental data for {ticker}. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 f"## Fundamental Report for {ticker}\n"
-                "**Valuation Assessment**: [UNDERVALUED / FAIR / OVERVALUED]\n"
-                "**What happened?**\n[1-2 sentences]\n\n"
-                "**Key Findings:**\n- [Finding 1]\n- [Finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Metric 1]\n\n"
-                "**Fundamental Risks:**\n- [Risk 1]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining earnings, revenue, and valuation]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining business health and profitability]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=fund_agent,
             async_execution=True,
         )
 
         port_task = Task(
-            description=(
-                "Use the portfolio tool to review active portfolio holdings and diversification. "
-                "Assess allocation balance (BALANCED/OVERWEIGHT/UNDERWEIGHT)."
-            ),
+            description="Use your tool to retrieve holdings for the active portfolio. Write a concise, beginner-friendly report with evidence.",
             expected_output=(
                 "## Portfolio Report\n"
-                "**Allocation Status**: [BALANCED / OVERWEIGHT / UNDERWEIGHT]\n"
-                "**What happened?**\n[1-2 sentences]\n\n"
-                "**Key Findings:**\n- [Finding 1]\n- [Finding 2]\n\n"
-                "**Supporting Evidence:**\n- [Holdings data]\n\n"
-                "**Portfolio Concentration & Balance Risks:**\n- [Risk 1]"
+                "**What happened?**\n"
+                "[1-2 sentences explaining current holdings and asset allocation]\n\n"
+                "**Why it matters?**\n"
+                "[1-2 sentences explaining diversification and risk exposure]\n\n"
+                "**Supporting Evidence:**\n"
+                "- [Evidence item 1]\n"
+                "- [Evidence item 2]\n\n"
+                "**Overall conclusion**\n"
+                "[2-3 sentences summarizing rebalancing recommendations, completely jargon-free]"
             ),
             agent=port_agent,
             async_execution=True,
@@ -689,35 +693,49 @@ class FinancialCrew:
 
         manager_task = Task(
             description=(
-                f"You are the Chief Investment Officer (CIO). Review the reports from News, Technical, "
-                f"Risk, Fundamental, and Portfolio analysts for {company} ({ticker}).\n"
+                f"Review the sentiment, technical, risk, fundamental, and portfolio reports for {company} ({ticker}). "
+                f"Generate a balanced, beginner-friendly master investment summary preserving the classic format.\n"
                 "CRITICAL INSTRUCTIONS:\n"
-                "1. Declare an explicit final recommendation: BUY, SELL, or HOLD.\n"
-                "   You MUST include the line exactly as: `Final Verdict: BUY` (or SELL, or HOLD).\n"
-                "2. Explicitly identify conflicting findings (e.g. Bullish technicals vs Bearish news).\n"
-                "3. Explain the investment reasoning clearly for beginners.\n"
-                "4. Explicitly list any limitations and missing data. If an agent report is missing or "
-                "   marked UNAVAILABLE, state this limitation clearly. DO NOT INVENT missing data."
+                "1. Declare the final recommendation explicitly on its own line: Final Verdict: BUY (or SELL, or HOLD).\n"
+                "2. Maintain the master summary format:\n"
+                "   ## 📰 News Summary\n"
+                "   ## 📈 Technical Summary\n"
+                "   ## 🛡️ Risk Summary\n"
+                "   ## 🏢 Fundamental Summary\n"
+                "   ## 💼 Portfolio Summary\n"
+                "   ---\n"
+                "   ## 🎯 Overall Investment Outlook\n"
+                "   Final Verdict: [BUY / SELL / HOLD]\n"
+                "   **What happened?**\n"
+                "   **Why it matters?**\n"
+                "   **Supporting Evidence:**\n"
+                "   **Overall conclusion**\n"
+                "3. If an agent report is missing or unavailable, state that limitation clearly. Do NOT invent missing data."
             ),
             expected_output=(
                 f"# Master Investment Summary for {company} ({ticker})\n\n"
-                "### 🎯 Final Verdict: [BUY / SELL / HOLD]\n\n"
-                "## 📋 Executive Summary\n"
-                "[2-3 sentence beginner-friendly overview]\n\n"
-                "## 🔍 Key Findings\n"
-                "- [Synthesized finding 1]\n"
-                "- [Synthesized finding 2]\n\n"
-                "## 📊 Supporting Evidence\n"
-                "- [Evidence across modules]\n\n"
-                "## ⚠️ Conflicting Findings & Divergences\n"
-                "- [Explicit conflict resolution between agents]\n\n"
-                "## ℹ️ Limitations & Missing Data\n"
-                "- [Acknowledged missing metrics or unavailable inputs]\n\n"
-                "## 🛡️ Downside Risks\n"
-                "- [Key downside risk factors]\n\n"
-                "---\n\n"
-                "## 🎯 Overall Investment Outlook\n"
-                "[Final holistic summary]"
+                f"## 📰 News Summary\n"
+                f"[Simple explanation derived from News Agent]\n\n"
+                f"## 📈 Technical Summary\n"
+                f"[Simple explanation derived from Technical Agent]\n\n"
+                f"## 🛡️ Risk Summary\n"
+                f"[Simple explanation derived from Risk Agent]\n\n"
+                f"## 🏢 Fundamental Summary\n"
+                f"[Simple explanation derived from Fundamental Agent]\n\n"
+                f"## 💼 Portfolio Summary\n"
+                f"[Simple explanation derived from Portfolio Agent]\n\n"
+                f"---\n\n"
+                f"## 🎯 Overall Investment Outlook\n"
+                f"Final Verdict: [BUY / SELL / HOLD]\n\n"
+                f"**What happened?**\n"
+                f"[1-2 clear summary sentences]\n\n"
+                f"**Why it matters?**\n"
+                f"[1-2 clear sentences explaining the impact]\n\n"
+                f"**Supporting Evidence:**\n"
+                f"- [Evidence item 1]\n"
+                f"- [Evidence item 2]\n\n"
+                f"**Overall conclusion**\n"
+                f"[2-3 sentences summarizing the final takeaway, completely jargon-free]"
             ),
             agent=manager_agent,
             context=[news_task, tech_task, risk_task, fund_task, port_task],

@@ -437,3 +437,37 @@ def test_groq_tool_use_failed_recovery():
     assert "Action: get_stock_fundamental_data" in content
     assert '"ticker": "TCS"' in content
     assert "Thought:" in content
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 12. Classic "What happened? / Why it matters? / Supporting Evidence" Format
+# ─────────────────────────────────────────────────────────────────────────────
+def test_classic_what_happened_why_it_matters_output_structure():
+    sample_classic_news = (
+        "## News Report for AAPL\n"
+        "**What happened?**\n"
+        "Apple exceeded earnings estimates on strong iPhone demand and services growth.\n\n"
+        "**Why it matters?**\n"
+        "Highlights operating resilience and pricing power in premium consumer tech.\n\n"
+        "**Supporting Evidence:**\n"
+        "- iPhone gross margin expanded to 44.5%\n"
+        "- Services revenue reached all-time high of $24.2 billion\n\n"
+        "**Overall conclusion**\n"
+        "Strong core asset with sustained cash flows."
+    )
+
+    model, err = parse_and_validate_output(sample_classic_news, NewsAnalysisOutput)
+    assert err is None
+    assert model is not None
+    assert "Apple exceeded earnings" in model.what_happened
+    assert "pricing power" in model.why_it_matters
+    assert len(model.supporting_evidence) == 2
+    assert "Services revenue" in model.supporting_evidence[1]
+    assert "sustained cash flows" in model.overall_conclusion
+
+    # Check to_markdown output preserves the classic headings
+    md = model.to_markdown(ticker="AAPL")
+    assert "**What happened?**" in md
+    assert "**Why it matters?**" in md
+    assert "**Supporting Evidence:**" in md
+    assert "**Overall conclusion**" in md
