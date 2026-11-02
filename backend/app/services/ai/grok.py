@@ -8,9 +8,10 @@ Model cascade: tries models in order, each has its own TPD quota.
 If the primary model is rate-limited (per-minute OR daily), falls back to next.
 
 Model priority order (best quality first):
-  1. llama-3.3-70b-versatile       — best quality, 100K TPD
-  2. meta-llama/llama-4-scout-17b  — strong quality, separate daily quota
-  3. llama-3.1-8b-instant          — fast & reliable, separate daily quota
+  1. meta-llama/llama-4-maverick-17b-128e-instruct  — best quality, separate quota
+  2. meta-llama/llama-4-scout-17b-16e-instruct       — strong, separate daily quota
+  3. llama-3.3-70b-specdec                           — fast & reliable speculative decoding
+  4. llama3-70b-8192                                 — stable legacy fallback
 """
 
 from app.core.config import settings
@@ -20,9 +21,10 @@ from typing import Any
 _GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 _MODEL_CASCADE = [
-    "llama-3.3-70b-versatile",
+    "meta-llama/llama-4-maverick-17b-128e-instruct",
     "meta-llama/llama-4-scout-17b-16e-instruct",
-    "llama-3.1-8b-instant",
+    "llama-3.3-70b-specdec",
+    "llama3-70b-8192",
 ]
 
 _RATE_LIMIT_KEYWORDS = (

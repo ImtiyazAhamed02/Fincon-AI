@@ -37,13 +37,12 @@ _QUOTA_KEYWORDS = (
     "429", "quota", "too many requests", "resource_exhausted",
     "rate limit", "ratelimit", "quota exceeded", "exceeded your current quota",
     "resourceexhausted", "503", "service unavailable", "high demand", "overloaded",
+    "api key invalid", "api_key_invalid", "401",
 )
 
 # Gemini REST probe endpoint (no retries, fast)
-_GEMINI_PROBE_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.5-flash:generateContent"
-)
+# Model is resolved from settings at call time so it stays in sync with .env
+_GEMINI_PROBE_BASE = "https://generativelanguage.googleapis.com/v1beta/models/"
 _PROBE_TIMEOUT = 5  # seconds
 _FALLBACK_TTL  = 300.0  # 5 minutes
 
@@ -59,8 +58,14 @@ def _probe_gemini(api_key: str) -> tuple[bool, str]:
     Does NOT use LangChain — so no tenacity retries.
     """
     try:
+        from app.core.config import settings
+        model = getattr(settings, "GEMINI_MODEL", "gemini-2.0-flash")
+        probe_url = f"{_GEMINI_PROBE_BASE}{model}:generateContent"
+    except Exception:
+        probe_url = f"{_GEMINI_PROBE_BASE}gemini-2.0-flash:generateContent"
+    try:
         resp = _requests.post(
-            _GEMINI_PROBE_URL,
+            probe_url,
             params={"key": api_key},
             json={"contents": [{"parts": [{"text": "hi"}]}]},
             timeout=_PROBE_TIMEOUT,
@@ -70,6 +75,9 @@ def _probe_gemini(api_key: str) -> tuple[bool, str]:
         if resp.status_code in (429, 503):
             body = resp.text[:200]
             return False, f"HTTP {resp.status_code}: {body}"
+        if resp.status_code == 401:
+            body = resp.text[:200]
+            return False, f"API key invalid or expired (HTTP 401): {body}"
         return False, f"HTTP {resp.status_code}"
     except Exception as e:
         return False, str(e)
@@ -127,11 +135,14 @@ class SmartLLM(BaseChatModel):
     def _is_fallback_active(self) -> bool:
         return time.time() < self._fallback_until
 
-    def _activate_fallback(self, reason: str = "") -> None:
-        object.__setattr__(self, "_fallback_until", time.time() + _FALLBACK_TTL)
+    def _activate_fallback(self, reason: str = "", permanent: bool = False) -> None:
+        # If Gemini key is invalid, probe again after a short 30s window
+        # (not 5 min) to avoid locking out for too long during key rotation.
+        ttl = 30.0 if permanent else _FALLBACK_TTL
+        object.__setattr__(self, "_fallback_until", time.time() + ttl)
         logger.warning(
             f"[SmartLLM] Gemini unavailable ({reason}) — "
-            f"using Grok for next {_FALLBACK_TTL:.0f}s."
+            f"using Grok for next {ttl:.0f}s."
         )
 
     def _gemini_is_available(self) -> bool:
@@ -145,7 +156,10 @@ class SmartLLM(BaseChatModel):
         available, reason = _probe_gemini(self._gemini_api_key)
         object.__setattr__(self, "_gemini_last_error", reason)
         if not available:
-            self._activate_fallback(reason)
+            # Use a short TTL for invalid-key errors so the app recovers
+            # quickly once the key is updated without needing a restart.
+            is_key_error = "401" in reason or "invalid" in reason.lower()
+            self._activate_fallback(reason, permanent=is_key_error)
         return available
 
     # ── Core generation ───────────────────────────────────────────────────────

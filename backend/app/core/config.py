@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # ── AI Providers ──────────────────────────────────────────────────────────
     # Primary: Google Gemini
     GEMINI_API_KEY: str
-    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_MODEL: str = "gemini-2.0-flash"
 
     # Fallback: Grok (powered by Groq's inference API)
     # Get a free key at https://console.groq.com

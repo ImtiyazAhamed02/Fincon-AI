@@ -208,6 +208,8 @@ function AgentCard({ agent, ticker, portfolioId, state, onRun }) {
 function FullCrewCard({ state, onRun, ticker, companyName }) {
   const { loading, result, error } = state;
   const [expanded, setExpanded] = useState(false);
+  const { isDark } = useTheme();
+  const themeIndigo = isDark ? '#6366f1' : '#4f46e5';
 
   const rec = result && ['BUY', 'HOLD', 'SELL'].find(r => result.toUpperCase().includes(r));
   const recColor = rec === 'BUY' ? '#10b981' : rec === 'SELL' ? '#ef4444' : '#f59e0b';
@@ -352,8 +354,6 @@ function FullCrewCard({ state, onRun, ticker, companyName }) {
 // Stock Analysis Page
 // ─────────────────────────────────────────────────────────────────────────────
 export default function StockAnalysis() {
-  const { isDark } = useTheme();
-  const themeIndigo = isDark ? '#6366f1' : '#4f46e5';
   const [ticker, setTicker] = useState('');
   const [companyName, setCompanyName] = useState('');
 
