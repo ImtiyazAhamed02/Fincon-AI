@@ -23,8 +23,43 @@ def get_db_conn():
     finally:
         conn.close()
 
+def _apply_migrations(conn):
+    """Safely adds missing columns to existing SQLite tables without losing data."""
+    cur = conn.cursor()
+    
+    # 1. Inspect agent_runs columns
+    cur.execute("PRAGMA table_info(agent_runs)")
+    existing_agent_cols = {row["name"] for row in cur.fetchall()}
+    
+    new_agent_cols = [
+        ("task_name", "TEXT"),
+        ("status", "TEXT DEFAULT 'SUCCESS'"),
+        ("start_time", "TEXT"),
+        ("end_time", "TEXT"),
+        ("duration_seconds", "REAL"),
+        ("error_message", "TEXT"),
+    ]
+    for col_name, col_type in new_agent_cols:
+        if col_name not in existing_agent_cols:
+            try:
+                cur.execute(f"ALTER TABLE agent_runs ADD COLUMN {col_name} {col_type}")
+                logger.info(f"Migrated agent_runs: added column {col_name}")
+            except Exception as e:
+                logger.warning(f"Could not add column {col_name} to agent_runs: {e}")
+
+    # 2. Inspect analysis_history columns
+    cur.execute("PRAGMA table_info(analysis_history)")
+    existing_hist_cols = {row["name"] for row in cur.fetchall()}
+    if "confidence_factors" not in existing_hist_cols:
+        try:
+            cur.execute("ALTER TABLE analysis_history ADD COLUMN confidence_factors TEXT")
+            logger.info("Migrated analysis_history: added column confidence_factors")
+        except Exception as e:
+            logger.warning(f"Could not add confidence_factors to analysis_history: {e}")
+
+
 def init_db():
-    """Initializes the database using schema.sql and seeds default data."""
+    """Initializes the database using schema.sql, migrates missing columns, and seeds default data."""
     try:
         os.makedirs(DB_DIR, exist_ok=True)
         if not os.path.exists(SCHEMA_PATH):
@@ -36,6 +71,7 @@ def init_db():
             
         with get_db_conn() as conn:
             conn.executescript(schema_sql)
+            _apply_migrations(conn)
             logger.info("SQLite database tables initialized successfully.")
             
             # Seed default user if not exists

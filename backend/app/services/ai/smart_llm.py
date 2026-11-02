@@ -222,6 +222,14 @@ class SmartLLM(BaseChatModel):
                 logger.info(f"[SmartLLM] Grok OK ({model}).")
                 return result
             except Exception as e:
+                err_str = str(e)
+                # Recover from Groq's "Tool choice is none, but model called a tool" error
+                if "tool_use_failed" in err_str or "tool choice is none, but model called a tool" in err_str.lower():
+                    recovered = self._recover_groq_tool_call(e)
+                    if recovered:
+                        logger.info(f"[SmartLLM] Recovered Groq tool call from {model} into CrewAI ReAct syntax.")
+                        return recovered
+
                 if _is_rate_limited(e):
                     logger.warning(f"[SmartLLM] {model} rate-limited — trying next.")
                     last_error = e
@@ -260,6 +268,59 @@ class SmartLLM(BaseChatModel):
                 f"- Gemini Status: {gemini_reason}\n"
                 f"- Grok Fallback Status: {groq_reason}"
             ) from last_error
+
+    @staticmethod
+    def _recover_groq_tool_call(e: Exception) -> Optional[ChatResult]:
+        """
+        Groq models (such as gpt-oss) may output a native tool call when tools are described in the prompt
+        even when tools aren't bound in the payload, resulting in a 400 'tool_use_failed'.
+        This intercepts the failed generation and converts it into CrewAI ReAct syntax:
+          Thought: I need to use the {name} tool.
+          Action: {name}
+          Action Input: {arguments}
+        allowing CrewAI's agent loop to seamlessly continue.
+        """
+        import json
+        import re
+        from langchain_core.outputs import ChatResult, ChatGeneration
+        from langchain_core.messages import AIMessage
+
+        failed_gen = None
+        if hasattr(e, "body") and isinstance(e.body, dict):
+            err = e.body.get("error", {})
+            if err.get("code") == "tool_use_failed":
+                failed_gen = err.get("failed_generation")
+
+        if not failed_gen:
+            err_str = str(e)
+            if "tool_use_failed" in err_str:
+                match = re.search(r"failed_generation[\'\"]?\s*:\s*[\'\"]({.*?})[\'\"]\s*\}", err_str)
+                if not match:
+                    match = re.search(r"failed_generation[\'\"]?\s*:\s*[\'\"](.*?)[\'\"]\s*\}", err_str)
+                if match:
+                    raw_match = match.group(1).replace('\\"', '"').replace("\\'", "'")
+                    failed_gen = raw_match
+
+        if failed_gen:
+            try:
+                tool_data = json.loads(failed_gen) if isinstance(failed_gen, str) else failed_gen
+                name = tool_data.get("name")
+                args = tool_data.get("arguments", {})
+                if isinstance(args, str):
+                    try:
+                        args = json.loads(args)
+                    except Exception:
+                        pass
+                args_str = json.dumps(args) if isinstance(args, dict) else str(args)
+                crew_action_text = (
+                    f"Thought: I need to use the {name} tool to retrieve information.\n"
+                    f"Action: {name}\n"
+                    f"Action Input: {args_str}\n"
+                )
+                return ChatResult(generations=[ChatGeneration(message=AIMessage(content=crew_action_text))])
+            except Exception as parse_err:
+                logger.warning(f"[SmartLLM] Failed to parse failed_generation from Groq: {parse_err}")
+        return None
 
 
     # ── LangChain protocol ────────────────────────────────────────────────────

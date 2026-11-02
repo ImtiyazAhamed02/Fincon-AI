@@ -41,10 +41,11 @@ CREATE TABLE IF NOT EXISTS analysis_history (
     ticker TEXT NOT NULL,
     company_name TEXT NOT NULL,
     recommendation TEXT NOT NULL,
-    score INTEGER NOT NULL,
+    score REAL NOT NULL,
     agents TEXT NOT NULL, -- JSON array of strings
     summary TEXT NOT NULL,
     duration TEXT NOT NULL,
+    confidence_factors TEXT, -- JSON breakdown of scoring factors
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -53,9 +54,15 @@ CREATE TABLE IF NOT EXISTS agent_runs (
     id TEXT PRIMARY KEY,
     session_id TEXT NOT NULL,
     agent_name TEXT NOT NULL,
+    task_name TEXT,
     input_data TEXT,
     output_data TEXT,
     confidence_score REAL,
+    status TEXT DEFAULT 'SUCCESS',
+    start_time TEXT,
+    end_time TEXT,
+    duration_seconds REAL,
+    error_message TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

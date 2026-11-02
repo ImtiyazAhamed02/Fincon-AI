@@ -5,8 +5,11 @@ Application Settings  (updated for multi-AI provider support)
 ─────────────────────────────────────────────────────────────────────────────
 """
 
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
+
+ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
 
 
 class Settings(BaseSettings):
@@ -23,7 +26,7 @@ class Settings(BaseSettings):
     # Fallback: Grok (powered by Groq's inference API)
     # Get a free key at https://console.groq.com
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: Optional[str] = "llama-3.3-70b-versatile"
+    GROQ_MODEL: Optional[str] = "openai/gpt-oss-120b"
 
     # News Provider
     FINNHUB_API_KEY: Optional[str] = None
@@ -34,7 +37,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(ENV_PATH, ".env"),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",   # Silently ignore any unknown .env keys

@@ -10,7 +10,7 @@ router = APIRouter()
 def get_sessions():
     try:
         rows = SQLiteClient.execute(
-            "SELECT id, session_id, ticker, company_name, recommendation, score, agents, summary, duration, created_at "
+            "SELECT id, session_id, ticker, company_name, recommendation, score, agents, summary, duration, confidence_factors, created_at "
             "FROM analysis_history ORDER BY created_at DESC"
         )
         
@@ -30,6 +30,13 @@ def get_sessions():
                 except Exception:
                     agents_list = [row["agents"]] if row["agents"] else []
 
+                conf_factors = None
+                if row.get("confidence_factors"):
+                    try:
+                        conf_factors = json.loads(row["confidence_factors"])
+                    except Exception:
+                        conf_factors = None
+
                 sessions.append({
                     "id": row["session_id"],
                     "ticker": row["ticker"],
@@ -40,7 +47,8 @@ def get_sessions():
                     "date": dt.strftime("%Y-%m-%d"),
                     "time": dt.strftime("%I:%M %p"),
                     "summary": row["summary"],
-                    "duration": row["duration"]
+                    "duration": row["duration"],
+                    "confidence_factors": conf_factors
                 })
             except Exception as e:
                 print(f"Error parsing session row: {e}")
@@ -62,12 +70,12 @@ def get_stats():
         analyses_today = 0
         total_score = 0
         for row in rows:
-            total_score += row["score"]
+            total_score += (row["score"] or 0)
             created = row["created_at"] or ""
             if created.startswith(today_str):
                 analyses_today += 1
 
-        avg_confidence = int(total_score / total_sessions) if total_sessions > 0 else 0
+        avg_confidence = round(total_score / total_sessions, 1) if total_sessions > 0 else 0
         
         return {
             "status": "success",
@@ -87,7 +95,7 @@ def get_agent_runs():
     """Returns recent agent execution logs from the agent_runs table."""
     try:
         rows = SQLiteClient.execute(
-            "SELECT id, session_id, agent_name, input_data, output_data, confidence_score, created_at "
+            "SELECT id, session_id, agent_name, task_name, input_data, output_data, confidence_score, status, start_time, end_time, duration_seconds, error_message, created_at "
             "FROM agent_runs ORDER BY created_at DESC LIMIT 100"
         )
         
@@ -106,9 +114,16 @@ def get_agent_runs():
                     "id": row["id"],
                     "session_id": row["session_id"],
                     "agent_name": row["agent_name"],
+                    "task_name": row["task_name"] or row["agent_name"],
                     "input_data": row["input_data"],
                     "output_preview": (row["output_data"] or "")[:200],
+                    "output_full": row["output_data"],
                     "confidence_score": row["confidence_score"],
+                    "status": row["status"] or "SUCCESS",
+                    "start_time": row["start_time"],
+                    "end_time": row["end_time"],
+                    "duration_seconds": row["duration_seconds"],
+                    "error_message": row["error_message"],
                     "date": dt.strftime("%Y-%m-%d"),
                     "time": dt.strftime("%I:%M %p"),
                 })
